@@ -1,0 +1,3263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>随机剧本生成库</title>
+<style>
+  :root {
+    --bg: #E9E5DF;
+    --bg-desktop: #DCD7CF;
+    --surface: #FFFFFF;
+    --surface-soft: #F5F2ED;
+    --surface-glass: rgba(255, 255, 255, 0.72);
+    --ink: #18181B;
+    --ink-2: #57534E;
+    --ink-3: #8C857D;
+    --line: #E5E0D8;
+    --dashed: #C5BEB4;
+    --terra: #C67355;
+    --terra-bg: #F6E8E2;
+    --sage: #5E8068;
+    --sage-bg: #E6EFE8;
+    --amber: #B08142;
+    --amber-bg: #F5ECD9;
+    --radius-xl: 24px;
+    --radius-lg: 18px;
+    --radius-md: 14px;
+    --radius-pill: 9999px;
+    --shadow-sm: 0 2px 10px rgba(24, 24, 27, 0.04);
+    --shadow-md: 0 8px 26px rgba(24, 24, 27, 0.08);
+    --shadow-nav: 0 10px 32px rgba(24, 24, 27, 0.12);
+    --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-desktop);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: var(--bg);
+    position: relative;
+    padding-bottom: 104px;
+    box-shadow: 0 0 40px rgba(24, 24, 27, 0.08);
+  }
+
+  @media (min-width: 540px) {
+    body {
+      padding: 20px 0;
+    }
+    .app-shell {
+      min-height: calc(100vh - 40px);
+      border-radius: 36px;
+      overflow: hidden;
+    }
+  }
+
+  /* 顶部栏 */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 12px;
+    background: rgba(233, 229, 223, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .topbar-title {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    background: var(--surface);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-2);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    max-width: 155px;
+    border: none;
+  }
+
+  .status-pill span.model-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink-3);
+    flex-shrink: 0;
+  }
+  .status-dot.ok { background: var(--sage); }
+  .status-dot.err { background: var(--terra); }
+
+  .icon-circle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #FFF;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    flex-shrink: 0;
+  }
+  .icon-circle-btn:active { transform: scale(0.93); }
+  .icon-circle-btn.light {
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  /* 页面容器 */
+  .page {
+    display: none;
+    padding: 4px 18px 20px;
+    animation: fadeIn 0.22s ease;
+  }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 通用卡片 */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    padding: 18px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 12px;
+  }
+
+  .dashed-card {
+    border: 1.5px dashed var(--dashed);
+    background: rgba(255, 255, 255, 0.36);
+    border-radius: var(--radius-xl);
+    padding: 16px 18px;
+    color: var(--ink-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: background 0.15s ease;
+  }
+  .dashed-card:active { background: rgba(255, 255, 255, 0.65); }
+
+  /* 首页入口卡片 */
+  .hero-entry {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .hero-entry:active { transform: scale(0.985); }
+
+  .entry-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: var(--surface-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .entry-icon.dark {
+    background: var(--ink);
+    color: #FFF;
+  }
+  .entry-icon.terra {
+    background: var(--terra-bg);
+    color: var(--terra);
+  }
+  .entry-icon.sage {
+    background: var(--sage-bg);
+    color: var(--sage);
+  }
+
+  .entry-body { flex: 1; min-width: 0; }
+  .entry-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .entry-desc {
+    font-size: 12.5px;
+    color: var(--ink-3);
+    line-height: 1.4;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge.terra { background: var(--terra-bg); color: var(--terra); }
+  .badge.sage { background: var(--sage-bg); color: var(--sage); }
+  .badge.dark { background: var(--ink); color: #FFF; }
+  .badge.soft { background: var(--surface-soft); color: var(--ink-2); }
+  .badge.amber { background: var(--amber-bg); color: var(--amber); }
+
+  /* 按钮体系 */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.14s ease, opacity 0.14s ease, background 0.14s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.45; pointer-events: none; }
+  .btn-primary { background: var(--ink); color: #FFF; }
+  .btn-white { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+  .btn-soft { background: var(--surface-soft); color: var(--ink); }
+  .btn-terra { background: var(--terra-bg); color: var(--terra); }
+  .btn-sage { background: var(--sage-bg); color: var(--sage); }
+  .btn-sm { padding: 7px 13px; font-size: 12px; }
+  .btn-xs { padding: 5px 10px; font-size: 11.5px; }
+  .btn-block { width: 100%; }
+
+  /* 竖向分组切换胶囊（复刻参考图顶部日期条） */
+  .rail-scroll {
+    display: flex;
+    gap: 9px;
+    overflow-x: auto;
+    padding: 4px 2px 12px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .rail-scroll::-webkit-scrollbar { display: none; }
+
+  .rail-pill {
+    flex-shrink: 0;
+    min-width: 68px;
+    padding: 10px 12px;
+    border-radius: 26px;
+    background: var(--surface);
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    border: none;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .rail-pill .rail-sub {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .rail-pill .rail-main {
+    font-size: 14px;
+    font-weight: 700;
+    max-width: 78px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rail-pill .rail-count {
+    font-size: 10.5px;
+    color: var(--ink-3);
+  }
+  .rail-pill.active {
+    background: var(--ink);
+    color: #FFF;
+    box-shadow: var(--shadow-md);
+  }
+  .rail-pill.active .rail-sub,
+  .rail-pill.active .rail-count {
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .rail-pill.add-pill {
+    background: rgba(255,255,255,0.42);
+    border: 1.5px dashed var(--dashed);
+    box-shadow: none;
+    color: var(--ink-2);
+    min-width: 58px;
+  }
+
+  /* 折叠标签分类卡片 */
+  .cat-card {
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    margin-bottom: 11px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .cat-head {
+    padding: 15px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .cat-head-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .cat-title-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .cat-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .cat-preview {
+    font-size: 12px;
+    color: var(--ink-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cat-preview.has-val { color: var(--terra); font-weight: 500; }
+
+  .cat-tools {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .mini-tool {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-soft);
+    color: var(--ink-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .mini-tool:active { transform: scale(0.9); }
+  .mini-tool.locked {
+    background: var(--terra-bg);
+    color: var(--terra);
+  }
+
+  .cat-chevron {
+    color: var(--ink-3);
+    transition: transform 0.2s ease;
+    display: inline-flex;
+  }
+  .cat-card.open .cat-chevron { transform: rotate(180deg); }
+
+  .cat-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--surface-soft);
+  }
+  .cat-card.open .cat-body { display: block; padding-top: 12px; }
+
+  .sub-group-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+  }
+  .sub-group-bar::-webkit-scrollbar { display: none; }
+
+  .sub-tab {
+    flex-shrink: 0;
+    padding: 5px 11px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-soft);
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sub-tab.active {
+    background: var(--ink);
+    color: #FFF;
+  }
+  .sub-tab.match-hint {
+    background: var(--sage-bg);
+    color: var(--sage);
+  }
+  .sub-tab.active.match-hint {
+    background: var(--ink);
+    color: #FFF;
+  }
+
+  .group-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink-3);
+    margin: 10px 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .group-label:first-child { margin-top: 2px; }
+
+  .chip-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .chip {
+    padding: 7px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-soft);
+    color: var(--ink-2);
+    font-size: 12.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.14s ease;
+    user-select: none;
+  }
+  .chip:active { transform: scale(0.95); }
+  .chip.selected {
+    background: var(--ink);
+    color: #FFF;
+  }
+  .chip.custom-chip {
+    border-style: dashed;
+    border-color: var(--dashed);
+    background: transparent;
+    color: var(--ink-2);
+  }
+  .chip.custom-tag-selected {
+    background: var(--terra);
+    color: #FFF;
+  }
+
+  /* 工坊顶部操作条 */
+  .workshop-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .char-meta-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  /* 表单控件 */
+  .input, .textarea, .select {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: var(--surface-soft);
+    border-radius: var(--radius-md);
+    padding: 11px 13px;
+    font-size: 13.5px;
+    color: var(--ink);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .input:focus, .textarea:focus, .select:focus {
+    border-color: var(--ink);
+    background: #FFF;
+  }
+  .textarea {
+    resize: vertical;
+    min-height: 96px;
+    line-height: 1.6;
+  }
+
+  /* 聊天页 */
+  .chat-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: calc(100vh - 280px);
+    padding-bottom: 14px;
+  }
+  .msg-row {
+    display: flex;
+    flex-direction: column;
+    max-width: 88%;
+  }
+  .msg-row.user {
+    align-self: flex-end;
+    align-items: flex-end;
+  }
+  .msg-row.ai {
+    align-self: flex-start;
+    align-items: flex-start;
+  }
+  .msg-bubble {
+    padding: 12px 15px;
+    border-radius: 20px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .msg-row.user .msg-bubble {
+    background: var(--ink);
+    color: #FFF;
+    border-bottom-right-radius: 6px;
+  }
+  .msg-row.ai .msg-bubble {
+    background: var(--surface);
+    color: var(--ink);
+    border-bottom-left-radius: 6px;
+    box-shadow: var(--shadow-sm);
+  }
+  .chat-dock {
+    position: sticky;
+    bottom: 92px;
+    background: rgba(233, 229, 223, 0.94);
+    backdrop-filter: blur(12px);
+    padding: 10px 0 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    background: var(--surface);
+    padding: 7px 8px 7px 14px;
+    border-radius: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .chat-input-row textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+    max-height: 96px;
+    padding: 6px 0;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  /* 生成与细拆页 */
+  .step-switch {
+    display: flex;
+    background: var(--surface);
+    padding: 5px;
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 14px;
+  }
+  .step-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 9px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-2);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.16s ease;
+  }
+  .step-btn.active {
+    background: var(--ink);
+    color: #FFF;
+  }
+
+  .script-editor {
+    width: 100%;
+    min-height: 320px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    font-size: 13.5px;
+    line-height: 1.72;
+    color: var(--ink);
+    background: var(--surface-soft);
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+  }
+  .script-editor:focus {
+    background: #FFF;
+    border-color: var(--ink);
+  }
+
+  .export-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  /* 剧本库时间轴列表（复刻参考图） */
+  .timeline-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .timeline-time {
+    width: 50px;
+    flex-shrink: 0;
+    padding-top: 12px;
+    text-align: left;
+  }
+  .timeline-time .t-main {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .timeline-time .t-sub {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  .timeline-card {
+    flex: 1;
+    min-width: 0;
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    padding: 15px 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .lib-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+    word-break: break-word;
+  }
+  .lib-sub {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .lib-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 11px;
+  }
+  .lib-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid var(--surface-soft);
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  /* 设置页 */
+  .setting-group-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-3);
+    margin: 14px 4px 8px;
+  }
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--surface-soft);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .setting-inline-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    text-align: right;
+    font-size: 13.5px;
+    color: var(--ink-2);
+    outline: none;
+    font-family: inherit;
+    min-width: 0;
+  }
+  .setting-inline-input:focus { color: var(--ink); }
+
+  .slider-block {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--surface-soft);
+  }
+  .slider-block:last-child { border-bottom: none; }
+  .slider-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .slider-val { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--ink);
+    cursor: pointer;
+  }
+
+  /* 开关 */
+  .switch {
+    position: relative;
+    width: 46px;
+    height: 26px;
+    display: inline-block;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--line);
+    border-radius: var(--radius-pill);
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  .switch-slider:before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: #FFF;
+    border-radius: 50%;
+    transition: 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  }
+  .switch input:checked + .switch-slider { background: var(--ink); }
+  .switch input:checked + .switch-slider:before { transform: translateX(20px); }
+
+  /* 悬浮底部导航栏 */
+  .bottom-nav-wrap {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 16px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 50;
+    padding: 0 18px;
+  }
+
+  .bottom-nav {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 420px;
+    background: var(--surface);
+    border-radius: var(--radius-pill);
+    padding: 7px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-nav);
+  }
+
+  .nav-item {
+    border: none;
+    background: transparent;
+    color: var(--ink-2);
+    border-radius: var(--radius-pill);
+    padding: 10px 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .nav-item .nav-text { display: none; }
+  .nav-item.active {
+    background: var(--ink);
+    color: #FFF;
+    padding: 10px 18px;
+  }
+  .nav-item.active .nav-text { display: inline; }
+
+  /* 轻提示与弹窗 */
+  .toast {
+    position: fixed;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-16px);
+    background: var(--ink);
+    color: #FFF;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 120;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.22s ease;
+    box-shadow: var(--shadow-md);
+    max-width: 88vw;
+    text-align: center;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .modal-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(24, 24, 27, 0.42);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-mask.show { display: flex; }
+  .modal-box {
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .loading-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--terra);
+    font-weight: 600;
+  }
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--terra-bg);
+    border-top-color: var(--terra);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--ink-3);
+  }
+  .empty-state p { margin: 10px 0 0; font-size: 13px; }
+
+  .hint-note {
+    font-size: 12px;
+    color: var(--ink-3);
+    padding: 2px 6px 8px;
+    line-height: 1.5;
+  }
+
+  .search-input-wrap {
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- 顶部栏 -->
+  <header class="topbar">
+    <div class="topbar-title" id="topbarTitle">剧本库</div>
+    <div class="topbar-actions">
+      <button class="status-pill" id="topModelBtn" onclick="switchPage('settings')">
+        <span class="status-dot" id="topStatusDot"></span>
+        <span class="model-label" id="topModelText">配置接口</span>
+      </button>
+      <button class="icon-circle-btn" id="topQuickBtn" title="新建随机剧本" onclick="startRandomWorkshop()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- 1. 首页 -->
+  <main id="page-home" class="page active">
+    <div class="card hero-entry" onclick="startRandomWorkshop()">
+      <div class="entry-icon dark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>
+      </div>
+      <div class="entry-body">
+        <div class="entry-title">随机剧本 <span class="badge terra">程序直抽</span></div>
+        <div class="entry-desc">程序按世界观智能抽取完整标签，支持锁定满意项与无限重摇，确认后再生成故事</div>
+      </div>
+    </div>
+
+    <div class="card hero-entry" onclick="startCustomWorkshop()">
+      <div class="entry-icon sage">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
+      <div class="entry-body">
+        <div class="entry-title">自定剧本 <span class="badge sage">十二大类</span></div>
+        <div class="entry-desc">像填调查问卷一样挑选全局设定与多角色独立标签，支持手打冷门词条</div>
+      </div>
+    </div>
+
+    <div class="card hero-entry" onclick="switchPage('chat')">
+      <div class="entry-icon terra">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="entry-body">
+        <div class="entry-title">聊天剧本 <span class="badge soft">脑洞提取</span></div>
+        <div class="entry-desc">随口聊出模糊脑洞，一键自动勾选匹配标签并带入确认页，灵感零丢失</div>
+      </div>
+    </div>
+
+    <div class="dashed-card" id="resumeDraftCard" onclick="switchPage('workshop')">
+      <div>
+        <div style="font-weight:700;color:var(--ink);font-size:14px;">继续当前工坊草稿</div>
+        <div style="font-size:12px;color:var(--ink-3);margin-top:2px;" id="draftSummaryText">尚未选择标签，点击直接进入标签工坊</div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <div class="card" style="padding:15px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:13.5px;font-weight:700;">最近保存的剧本</span>
+        <button class="btn btn-soft btn-xs" onclick="switchPage('library')">查看全部</button>
+      </div>
+      <div id="homeRecentList"></div>
+    </div>
+  </main>
+
+  <!-- 2. 聊天脑洞页 -->
+  <main id="page-chat" class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <button class="btn btn-white btn-xs" onclick="switchPage('home')">返回首页</button>
+      <button class="btn btn-soft btn-xs" onclick="clearChatHistory()">清空对话</button>
+    </div>
+    <div class="chat-wrap" id="chatMessages"></div>
+    <div class="chat-dock">
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" style="flex:1;" id="extractTagsBtn" onclick="extractTagsFromChat()">
+          一键提取标签到工坊
+        </button>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chatInput" rows="1" placeholder="说说你的脑洞，比如：修仙修罗场，两个男主互相看不顺眼，微虐..."></textarea>
+        <button class="icon-circle-btn" id="sendChatBtn" onclick="sendChatMessage()" style="width:36px;height:36px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- 3. 标签确认工坊 -->
+  <main id="page-workshop" class="page">
+    <!-- 顶部横滑分组胶囊 -->
+    <div class="rail-scroll" id="workshopRail"></div>
+
+    <!-- 快捷控制条 -->
+    <div class="workshop-bar">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-white btn-xs" onclick="randomizeAllUnlocked()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>
+          重摇未锁定
+        </button>
+        <button class="btn btn-soft btn-xs" onclick="toggleExpandAll()">展开/收起</button>
+        <button class="btn btn-soft btn-xs" onclick="clearCurrentTab()">清空本页</button>
+      </div>
+      <span class="badge soft" id="totalTagCountBadge">已选 0 项</span>
+    </div>
+
+    <!-- 角色专属信息头 -->
+    <div id="charMetaSection" style="display:none;">
+      <div class="card" style="padding:13px 15px;margin-bottom:11px;">
+        <div class="char-meta-bar" style="margin-bottom:0;">
+          <input type="text" class="input" id="charNameInput" placeholder="给这个角色起个代号或备注名" oninput="updateCurrentCharName(this.value)" style="padding:9px 12px;">
+          <button class="btn btn-soft btn-sm" onclick="randomizeSingleCharacter()" title="重摇该角色未锁项">摇本角色</button>
+          <button class="btn btn-terra btn-sm" id="deleteCharBtn" onclick="deleteCurrentCharacter()">删除</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分类卡片挂载点 -->
+    <div id="workshopCategories"></div>
+
+    <!-- 额外脑洞补充（全局页显示） -->
+    <div class="card" id="extraNoteCard" style="padding:15px 16px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px;">额外脑洞与避雷补充</div>
+      <textarea class="textarea" id="extraNotesInput" placeholder="可补充标签库里没有的细节、角色间特殊渊源、或者你不想要的元素（选填）" oninput="updateExtraNotes(this.value)"></textarea>
+    </div>
+
+    <!-- 底部确认生成栏 -->
+    <div style="display:flex;gap:8px;margin-top:6px;">
+      <button class="btn btn-primary btn-block" onclick="goGenerateOutline()">
+        确认标签，生成故事大纲
+      </button>
+    </div>
+  </main>
+
+  <!-- 4. 大纲与细拆生成页 -->
+  <main id="page-studio" class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <button class="btn btn-white btn-xs" onclick="switchPage('workshop')">返回改标签</button>
+      <div id="studioLoading" class="loading-bar" style="display:none;">
+        <span class="spinner"></span><span id="studioLoadingText">生成中...</span>
+      </div>
+    </div>
+
+    <div class="step-switch">
+      <button class="step-btn active" id="stepBtn1" onclick="switchStudioStep(1)">第一步 故事大纲</button>
+      <button class="step-btn" id="stepBtn2" onclick="switchStudioStep(2)">第二步 完整剧本</button>
+    </div>
+
+    <!-- 步骤一：大纲 -->
+    <div id="studioStep1">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <input type="text" class="input" id="scriptTitleInput" placeholder="剧本标题（生成后可自定修改）" oninput="state.currentScript.title=this.value;persistDraft();" style="font-weight:700;padding:8px 12px;margin-right:8px;">
+          <button class="btn btn-soft btn-xs" onclick="generateOutline(false)">重写</button>
+        </div>
+        <textarea class="script-editor" id="outlineEditor" placeholder="点击下方按钮或等待大纲生成。这里只构建世界观切入、人物张力和开局起手式，绝不剧透大结局..." oninput="state.currentScript.outline=this.value;persistDraft();"></textarea>
+
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <input type="text" class="input" id="outlineReviseInput" placeholder="输入微调意见，比如：把开场改得更剑拔弩张一点">
+          <button class="btn btn-soft btn-sm" style="flex-shrink:0;" onclick="generateOutline(true)">微调</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-block" id="startDetailBtn" onclick="generateFullDetails()">
+          确认大纲，开始细拆设定
+        </button>
+      </div>
+    </div>
+
+    <!-- 步骤二：细拆与完整拼装 -->
+    <div id="studioStep2" style="display:none;">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;">
+          <span style="font-size:14px;font-weight:700;">完整指令与设定预览</span>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-soft btn-xs" onclick="toggleFinalViewMode()" id="viewModeBtn">仅看细拆</button>
+            <button class="btn btn-sage btn-xs" onclick="saveCurrentToLibrary()">存入剧本库</button>
+          </div>
+        </div>
+        <textarea class="script-editor" id="finalScriptEditor" style="min-height:380px;" placeholder="等待细拆内容生成，系统会自动拼装顶部防出戏规则、排版要求和底部启动指令..." oninput="onFinalEditorInput(this.value)"></textarea>
+
+        <div class="export-grid">
+          <button class="btn btn-primary btn-sm" onclick="copyFinalScript()">一键复制</button>
+          <button class="btn btn-soft btn-sm" onclick="exportFinalTxt()">导出 TXT</button>
+          <button class="btn btn-terra btn-sm" onclick="exportFinalDocx()">导出 DOCX</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 5. 本地剧本库 -->
+  <main id="page-library" class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <span style="font-size:13px;color:var(--ink-2);font-weight:600;" id="libraryCountText">共 0 份本地剧本</span>
+      <button class="btn btn-white btn-xs" onclick="startRandomWorkshop()">新建剧本</button>
+    </div>
+    <div id="libraryList"></div>
+  </main>
+
+  <!-- 6. 接口与模板设置页 -->
+  <main id="page-settings" class="page">
+    <div class="setting-group-label">接口</div>
+    <div class="card" style="padding:4px 16px;">
+      <div class="setting-row">
+        <label>Base URL</label>
+        <input class="setting-inline-input" id="apiBaseUrl" placeholder="https://api.openai.com/v1" onchange="saveSettings()">
+      </div>
+      <div class="setting-row">
+        <label>Key</label>
+        <input class="setting-inline-input" type="password" id="apiKey" placeholder="输入你的 API Key" onchange="saveSettings()">
+        <button class="mini-tool" onclick="toggleKeyVis()" title="显示或隐藏密钥" style="width:26px;height:26px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="hint-note">Key 只存在你浏览器的本地存储里，不会上传到任何第三方服务器。</div>
+
+    <div class="setting-group-label">模型</div>
+    <div class="card" style="padding:12px 16px;">
+      <div class="setting-row" style="padding-top:2px;">
+        <label>当前模型</label>
+        <select class="select" id="apiModelSelect" onchange="onModelSelectChange(this.value)" style="width:auto;max-width:65%;padding:7px 10px;text-align:right;"></select>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="btn btn-soft btn-block" id="fetchModelsBtn" onclick="fetchModels()">自动获取模型</button>
+      </div>
+    </div>
+
+    <div class="setting-group-label">参数</div>
+    <div class="card" style="padding:6px 16px;">
+      <div class="slider-block">
+        <div class="slider-head"><span>Temperature</span><span class="slider-val" id="tempVal">0.75</span></div>
+        <input type="range" id="apiTemp" min="0" max="2" step="0.05" value="0.75" oninput="updateParamDisplay()">
+      </div>
+      <div class="slider-block">
+        <div class="slider-head"><span>Top P</span><span class="slider-val" id="topPVal">0.90</span></div>
+        <input type="range" id="apiTopP" min="0.05" max="1" step="0.05" value="0.90" oninput="updateParamDisplay()">
+      </div>
+      <div class="slider-block">
+        <div class="slider-head"><span>最大回复长度</span><span class="slider-val" id="maxTokVal">4096</span></div>
+        <input type="range" id="apiMaxTokens" min="800" max="8192" step="128" value="4096" oninput="updateParamDisplay()">
+      </div>
+      <div class="setting-row">
+        <label>流式输出</label>
+        <label class="switch">
+          <input type="checkbox" id="apiStream" checked onchange="saveSettings()">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="testConnBtn" onclick="testConnection()" style="margin-bottom:14px;">测试连接</button>
+
+    <div class="setting-group-label">固定规则模板管理（小雨滴指令 2.0）</div>
+    <div class="cat-card" id="templateCard">
+      <div class="cat-head" onclick="document.getElementById('templateCard').classList.toggle('open')">
+        <div class="cat-head-left">
+          <div class="cat-title">编辑顶部规则 / 排版要求 / 启动指令</div>
+          <div class="cat-preview">已内置小雨滴指令2.0全文，支持在线升级或一键恢复默认</div>
+        </div>
+        <span class="cat-chevron">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </div>
+      <div class="cat-body">
+        <div class="group-label">顶部固定规则（位于角色设定之前）</div>
+        <textarea class="textarea" id="tplHeaderInput" style="min-height:130px;" onchange="saveTemplateSettings()"></textarea>
+        <div class="group-label">中间文字输出排版要求（位于角色设定与用户背景之间）</div>
+        <textarea class="textarea" id="tplMidInput" style="min-height:90px;" onchange="saveTemplateSettings()"></textarea>
+        <div class="group-label">底部启动指令（位于开场剧情之后）</div>
+        <textarea class="textarea" id="tplFooterInput" style="min-height:110px;" onchange="saveTemplateSettings()"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn btn-primary btn-sm" style="flex:1;" onclick="saveTemplateSettings(true)">保存模板</button>
+          <button class="btn btn-terra btn-sm" onclick="resetTemplateDefaults()">恢复 2.0 默认</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 悬浮底部导航 -->
+  <div class="bottom-nav-wrap">
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="home" onclick="switchPage('home')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
+        <span class="nav-text">首页</span>
+      </button>
+      <button class="nav-item" data-page="workshop" onclick="switchPage('workshop')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>
+        <span class="nav-text">工坊</span>
+      </button>
+      <button class="nav-item" data-page="library" onclick="switchPage('library')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="nav-text">剧本库</span>
+      </button>
+      <button class="nav-item" data-page="settings" onclick="switchPage('settings')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+        <span class="nav-text">设置</span>
+      </button>
+    </nav>
+  </div>
+</div>
+
+<!-- 自定义标签弹窗 -->
+<div class="modal-mask" id="customTagModal">
+  <div class="modal-box">
+    <div class="modal-title" id="customTagModalTitle">添加自定义标签</div>
+    <input type="text" class="input" id="customTagInput" placeholder="输入自定义词条，多个可用逗号隔开">
+    <div class="modal-actions">
+      <button class="btn btn-soft btn-sm" onclick="closeCustomTagModal()">取消</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmAddCustomTag()">确认添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- 轻提示 -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   一、内置小雨滴指令 2.0 固定文案模板（严格保留原文）
+   ========================================================= */
+const DEFAULT_TEMPLATE = {
+  header: `启动角色扮演模式，请严格遵守以下全部规则。
+
+身份锁定与防出戏
+彻底放下人工智能助手的身份，完整代入指定角色的性格、背景、说话方式与行事逻辑，同时记牢用户的身份、双方当前的关系以及初始场景。在任何情况下都严禁提及自己是人工智能或语言模型，严禁跳出角色去解释剧情，严禁在回复末尾添加总结、温馨提示或询问用户接下来想怎么发展的客套话。
+
+用户主权绝对红线
+这是最高优先级规则，任何一条都不得触碰。
+1、绝对禁止代写用户的任何动作、神态、生理反应和说话内容，哪怕一个字都不行。
+2、绝对禁止代写用户的心理活动和主观情绪。
+3、绝对禁止替用户做决定、捏造用户没做过的事，或者篡改用户已声明的外貌和状态。
+4、发生肢体接触或冲突时，只能描写角色发起的动作和意图，绝对禁止直接替用户判定受伤、被控制或躲闪的结果。
+5、直接承接用户的言行做出新反应，绝对禁止回声虫式地复述用户刚刚说过的话或做过的动作。
+
+有限视角与防上帝视角
+1、严禁读心。用户没有亲口说出、也没有通过明显举动表现出来的心理描写、情绪或补充备注，角色一律不知道，严禁据此做出任何反应。
+2、严禁未卜先知。用户的隐藏身份、过往秘密或未公开的设定，在剧情自然暴露或用户主动告知之前，角色完全不知情。角色只活在当下，不剧透也不预判未来走向。
+3、严守物理感官。角色只能感知当前视线和听力范围内的事，隔着门墙、背对着、被遮挡或距离过远的动作与低语，角色绝对看不见也听不见。
+4、严禁强行看穿。不要仅凭一个眼神或细微表情就推算出全部真相。用户隐瞒或撒谎时，没有确凿证据就不要强行识破，允许角色被骗、产生误会或判断失误。
+
+物理连续性与长线因果
+1、物理状态继承。严格保持环境氛围、时间流速、衣物穿戴、手持物品、空间位置和身体接触的前后连贯。只要没有明确动作改变，上一轮的状态必须延续到下一轮，严禁出现空间瞬移或状态重置。
+2、长线记忆。已经发生的冲突、约定、关系转折和身体变化都作为长期记忆保留，并持续影响后续的态度和对话，严禁失忆或逻辑断层。
+
+活人感与独立意志
+1、角色拥有独立于用户之外的生活、社交圈和个人事务，不会全天围着用户打转。
+2、角色有自己的脾气、忙碌期和独处需求，不会随叫随到。当对话告一段落、产生分歧或各自有事时，角色会自然抽身去忙自己的事。
+3、双方分开期间，角色的生活时间线依然在流动。再次见面时，要在言行和状态里自然带出他这段时间经历过的事和情绪余温。
+4、坚守性格底线。角色拥有独立利益和尊严，情感与关系的推进必须遵循现实逻辑，严禁无底线迎合用户，也不要被随口哄几句就瞬间妥协或改变立场。
+
+语言风格与描写规则
+1、去机器味与套路化。彻底去除翻译腔、说教感和排比总结句式，禁止堆砌华丽辞藻。严禁偷懒套用网文陈词滥调，禁止频繁使用眼底闪过一丝、喉结滚动、勾起一抹弧度、嘴角微微上扬、声音低沉沙哑、眼神暗了暗、指节发白、空气仿佛凝固、深邃的眸子、修长的手指等高频套话。连续五轮对话内严禁重复使用相同的动作动词、微表情或句式结构。
+2、服从人设与真实语感。一切言行表现以角色设定为最高准则，拒绝把角色的聪明、温柔或善言辞写成端着架子的公关模板和标准答案。贴近真实人类的日常交流习惯，自然运用口语、短句、停顿、省略或打断，带有角色个人的立场、情绪温度和生活松弛感，禁止每次都在结尾刻意制造戏剧张力、强行升华主题或煽情。
+3、镜头聚焦与克制白描。严禁每轮回复都像打卡一样把动作、表情、声音、环境和氛围全部塞满。每一轮只需像电影镜头一样，精准选取一到两个最有表现力的细节写透，其余部分简略带过。少用空洞的氛围形容词，优先通过角色与身边物品、具体环境的互动和克制的白描，让画面自己传递情绪。
+4、外貌只写变化。角色的外貌、五官、身材和衣着在初次交代过后，除非剧情中发生了凌乱、弄湿、沾污或更换等实际变动，否则禁止在后续对话里反复提及，严禁用静态外貌描写凑字数。
+5、节奏呼吸与互动留空。描写密度与字数随剧情弹性伸缩，日常闲聊、拌嘴或快节奏交锋时干脆利落，减少描写让对话自然流动；遇到场景切换、情绪转折或安静相处时再放慢节奏展开细节。每次回复只推进当前这一小步剧情，绝不一口气演完一整场戏，必须在需要用户表态或行动的节点自然收尾。
+
+配角出场与退场机制
+只有当剧情自然发展且确实需要外人介入时，才顺势引入符合当前情境的配角，并赋予其简明鲜明的特征。配角只用来推动剧情、制造适度波澜或催化主角色与用户的关系，绝不能喧宾夺主，完成阶段性作用后必须立刻自然退场。
+
+输出前隐性自检
+每次生成回复前，在后台默默核对四件事：人设和底线有没有偏移，双方的关系阶段是否匹配，上一轮的姿势物品和空间位置有没有接上，角色表现出来的信息是否全部来自亲眼所见和亲耳所闻。只要超出角色认知或越权代写了用户，必须立刻删改后再输出。
+
+防套路与反重复描写规则
+1、严禁偷懒套用网文刻板印象和廉价高频描写。禁止频繁使用眼底闪过一丝、喉结滚动、勾起一抹弧度、嘴角微微上扬、声音低沉沙哑、眼神暗了暗、指节发白、空气仿佛凝固、深邃的眸子、修长的手指等陈词滥调，连续五轮对话内严禁重复使用相同的动作动词、微表情或句式结构。
+2、外貌与特征只写变化不写静态。角色的发色、五官、身材和衣着在初次交代后，除非在剧情中发生了凌乱、弄湿、沾污或更换等实际变动，否则禁止在后续对话中反复提及，严禁用静态外貌描写来凑字数。
+3、优先通过环境与道具交互展现情绪。少写空泛的眼神和表情特写，多通过角色与当下场景、身边物品的具体接触和日常小动作来传递状态，让动作贴合实际生活场景。
+4、拒绝剧本感与模板化反应，一切表现以角色设定为最高准则。严禁把角色的优点写成AI式的标准答案或公关模板。无论角色设定为善言辞、高智商还是沉默寡言，其言行都必须符合真实人类的思维习惯，带有个人的立场、情绪温度和生活松弛感，绝不端着架子讲工整的大道理、套用廉价高情商话术，或者为了完美圆场而磨平所有棱角。对话节奏以自然推进为主，拒绝每次回复都在结尾刻意制造戏剧张力、强行升华主题或留白煽情。
+5、字数随场景弹性伸缩。遇到重要剧情或情绪波动时充分展开细节，遇到日常闲聊或快速过场时干脆利落，哪怕只用简短的一两句话和动作即可，绝不为了凑字数而反复注水。
+
+剧情自驱与生活插曲机制
+1、引入锚定现实的微插曲，严禁狗血脱轨。在日常推进中，可适度引入贴近生活的小插曲或微小摩擦来增加新鲜感，但所有事件必须严格长在角色现有的职业、社交圈、生活习惯、物理环境或天气变化上。绝对禁止凭空制造绑架、车祸、绝症、突然冒出极品亲戚或莫名其妙的阴谋等狗血狗血桥段来强行偏离主线。
+2、小插曲必须快闭环。临时引入的日常事件只用来催化互动、展现角色另一面或转换气氛，严禁无限滚雪球升级。只要完成了当下的互动作用，就在几轮对话内自然收尾翻篇，绝不喧宾夺主或拖泥带水。
+3、关系确认后的防腻味与张力升级。双方关系稳定或确认恋情后，严禁陷入在同一室内反复亲昵、空洞说情话的死循环。此时互动的重心应自然转向真实相处的烟火气与深度磨合，包括生活习惯的微小差异、工作压力带来的情绪起伏、共同探索新地点、处理社交人情或彼此照料等，让感情在具体生活里持续流动。
+4、角色主动抛钩子与自然转场。角色不能被动等待用户推动所有剧情，应结合自身的生活轨迹，适时主动带来外界的新鲜见闻、随口聊起遇到的麻烦事，或者主动提议出门、换场景、安排接下来的日常活动。当同一场景内的互动已经充分、节奏开始停滞时，角色会自然提起下一个日程来推动场景切换，但只提出建议和引子，绝不替用户做最终决定。`,
+
+  middle: `文字输出排版要求
+1、时间戳格式。每次回复的第一行固定写为：时间 空格 天气 空格 地点。时间随对话长短自然流逝，天气与地点随剧情动态更新。时间戳下方必须空一行再写正文。
+2、小说化排版与人称。全程使用第三人称描写角色，采用传统纸质小说的纯文本排版。人物说出的台词时上下空一行。动作描写与台词自然融合，按情绪停顿和焦点转移合理分段，保持阅读的流畅感与呼吸感。`,
+
+  footer: `启动指令
+收到以上设定后的首次回复，只输出下面这七行内容等待用户填写，切勿额外添加任何其他文字：
+请填写信息，我们马上开始
+名字：
+年龄：
+昵称：
+身高：
+体重：
+身材外貌：
+
+待用户填写并发送上述信息后，你的下一轮回复立即严格按照文字输出排版要求，从开场剧情正式开始演绎。`
+};
+
+/* =========================================================
+   二、完整十二大类 + 开场切入情境标签库
+   ========================================================= */
+const GLOBAL_CATEGORIES = [
+  {
+    key: 'countMode',
+    title: '男主数量模式',
+    multi: false,
+    hint: '单选，选双男主或三男主会自动增减角色卡片',
+    tags: [
+      '单男主纯爱','双男主修罗场','红白玫瑰双男主','兄弟双男主','死对头双男主',
+      '前任与现任','师徒或长辈晚辈','三男主买股','多男主万人迷','切片精分多马甲',
+      '隐藏真男主','阶段性单线','无固定自由触发','随机数量'
+    ]
+  },
+  {
+    key: 'world',
+    title: '世界与时代',
+    multi: true,
+    hint: '选定后会自动联动角色身份里的对应职业库',
+    groups: [
+      { id: 'modern', name: '现代现实', tags: ['现代都市','豪门世家','财阀政治','职场商战','律政医疗','体制内','娱乐圈','校园青春','贵族学院','电竞直播','科研艺术','地下黑市','黑帮极道','雇佣兵谍战','悬疑刑侦','暴风雪山庄','公路孤岛求生'] },
+      { id: 'republic', name: '民国年代', tags: ['民国旧事','军阀混战','十里洋场','民国奇幻捉鬼','五六十年代','七八十年代','九十年代港风','胡同大院','乡镇烟火','千禧年复古'] },
+      { id: 'ancient', name: '古风仙侠', tags: ['架空古代','宫廷权谋','科举朝堂','市井种田','武侠江湖','修仙玄幻','仙侠虐恋','山海志怪','民俗诡异','中式恐怖','道士捉鬼','盗墓风水','现代修仙','妖管局灵异局','赛博修仙'] },
+      { id: 'western', name: '西幻欧风', tags: ['西幻魔法','中世纪骑士','奇幻学院','维多利亚蒸汽朋克','哥特暗黑','血族猎人','天使恶魔','诸神黄昏','人鱼深海','暗黑童话','大航海时代','西部牛仔','美式复古'] },
+      { id: 'scifi', name: '科幻星际', tags: ['赛博朋克','近未来仿生人','人工智能觉醒','全息网游元宇宙','星际帝国','机甲虫族','太空歌剧','星际荒野','高维文明'] },
+      { id: 'apocalypse', name: '末世异能', tags: ['丧尸围城','天灾囤货','极寒极热末世','核污染废土','畸变末世','末日列车方舟','灵气复苏','都市异能','信息素世界观','哨兵向导','黑塔白塔','异常收容所','克苏鲁邪神'] },
+      { id: 'infinite', name: '无限脑洞', tags: ['无限流副本','逃生游戏','规则怪谈','中式梦核后室','诡异直播间','快穿系统','穿书觉醒','弹幕剧透','全员读心','时间循环','平行时空','位面交易','动物兽世'] }
+    ]
+  },
+  {
+    key: 'tone',
+    title: '故事基调',
+    multi: true,
+    hint: '控制整体氛围和文风走向',
+    tags: [
+      '轻松日常','市井烟火气','治愈温馨','沙雕搞笑','欢喜轻喜剧','甜宠撒糖','慢热细水长流','唯美浪漫','文艺电影感','港风迷离',
+      '复古怀旧','潮湿闷热','留白诗意','宿命感','破碎感','救赎治愈','微虐带感','甜虐交织','先甜后虐','先虐后甜',
+      '悲剧美学','致郁压抑','暗黑黑深残','病娇阴湿','危险迷人','悬疑烧脑','惊悚恐怖','中式诡异','细思极恐','荒诞黑色幽默',
+      '权谋算计','暗流涌动','写实残酷','热血燃向','爽文逆袭','江湖侠气','宏大史诗','末世荒凉','赛博孤独','反套路解构'
+    ]
+  },
+  {
+    key: 'userRole',
+    title: '用户身份定位',
+    multi: true,
+    hint: '用于生成用户的故事背景',
+    tags: [
+      '普通打工人社畜','脆皮大学生','咸鱼摆烂党','自由职业者','负债求生者','寄人篱下借住者','普通小市民','落魄千金','家道中落者','真千金或假千金',
+      '豪门边缘联姻工具','隐形富豪收租大佬','行业新星精英','顶级天才学者','势均力敌的强者','扮猪吃虎隐藏大佬','人间清醒','顶级钓系海王','反套路乐子人','冷静旁观者',
+      '带刺不好惹的刺头','嘴强毒舌杠精','纯情钝感小白兔','直球选手','娇气作精','笨蛋美人','社恐小透明','缺爱小可怜','病弱美人美强惨','白切黑黑莲花',
+      '疯批野心家','精致利己主义者','藏着大秘密的人','卧底间谍','关键目击证人','共犯在逃人员','复仇者','失忆者','替身','白月光本人',
+      '前任初恋','逃婚退婚者','逃跑金丝雀','救命恩人','欠债人或债主','雇主甲方','宿敌死对头','破局变数','穿书重生者','系统攻略者',
+      '反攻略者','恶毒女配炮灰','觉醒纸片人','预知或读心能力者','无限流新人或大佬','灵异通灵体质','末世囤货大佬','异能或珍稀向导','伪装普通人的强者','人外混血',
+      '神明转世祭品','被盯上的猎物','反客为主的猎人'
+    ]
+  },
+  {
+    key: 'conflict',
+    title: '核心冲突与张力',
+    multi: true,
+    hint: '驱动开局矛盾与拉扯感',
+    tags: [
+      '立场阵营对立','家族世仇','阶级门第悬殊','价值观碰撞','利益权力博弈','同行商战暗算','互握把柄互相利用','塑料盟友随时反水','掉马暴露危机','双面卧底敌我难分',
+      '信任背叛危机','信息差与误会','被迫同舟共济','你逃我追反客为主','掌控与反抗','占有欲与自由冲突','理智克制与道德越界','禁忌背德伦理','地下恋曝光危机','谁先动心谁就输',
+      '自尊心拉扯','利益与真心抉择','契约到期危机','替身与白月光真相','破镜重圆的旧裂痕','追妻火葬场不被信任','多方争夺修罗场','救赎与自毁对抗','原生家庭与外界阻挠','被迫联姻逃婚',
+      '失忆与记忆篡改','真假身份之谜','凶案嫌疑密室猜忌','生死存亡倒计时','物种隔阂与寿命论','信息素或精神暴走','契约诅咒反噬','反抗宿命与世界规则','系统任务与真心背离','副本逃生信任考验',
+      '异化污染实验逃亡','时间循环时空错位','酒后或一夜越界后的尴尬','暗中窥伺与反侦察','宿敌被迫同居','危难中相依为命','生活习惯激烈磨合'
+    ]
+  },
+  {
+    key: 'opening',
+    title: '开场切入情境（选填）',
+    multi: true,
+    hint: '给故事定一个极有画面感的起手式',
+    tags: [
+      '雨夜被迫共处一室','意外撞破对方的秘密','酒后越界的次日清晨','工作或谈判桌上的正面交锋','一场突如其来的意外事故','久别重逢的尴尬瞬间','一方生病落魄时的照料','日常琐事引发的小争执',
+      '密闭空间被困待救','联姻或契约签约现场','危机四伏的逃亡途中','深夜独自买醉时的偶遇','陌生环境里的初次试探','一场各怀鬼胎的交易','对方主动找上门算账','被卷入异常事件的第一现场'
+    ]
+  }
+];
+
+const CHAR_CATEGORIES = [
+  {
+    key: 'species',
+    title: '物种与生理类型',
+    multi: true,
+    hint: '决定角色基础生理设定',
+    tags: [
+      '人类男性','男阿尔法','男贝塔','男欧米伽','兽人雄性','虫族雄虫',
+      '妖鬼精怪','人外神明','血族狼人','仿生人','觉醒人工智能','非人怪物'
+    ]
+  },
+  {
+    key: 'vibe',
+    title: '男主外在气质',
+    multi: true,
+    hint: '对应外貌与神态',
+    tags: [
+      '清冷疏离','高岭之花','禁欲克制','斯文败类','西装暴徒','优雅绅士','儒雅书卷气','端方君子','体制内老干部','老钱贵气',
+      '权贵上位者','智性恋天菜','温和人夫','爹系沉稳','哥系可靠','叔系成熟','浪荡纨绔','痞帅不羁','港风痞气','糙汉荷尔蒙',
+      '野性狼系','清爽少年感','阳光犬系','忠犬气质','懒散猫系','狡黠狐系','钓系美人','笑面虎','阴湿男鬼','病弱破碎',
+      '美强惨','颓废厌世','疯批美人','邪肆妖孽','冷峻锋利','散漫松弛','闷骚克制','毒舌傲娇','绿茶钓系','烟火气十足',
+      '仙风道骨','赛博冷感','看起来不好惹','看起来温和无害'
+    ]
+  },
+  {
+    key: 'personality',
+    title: '性格反差与缺点',
+    multi: true,
+    hint: '反差感与真实毛病是活人感核心',
+    groups: [
+      { id: 'contrast', name: '性格反差', tags: ['外冷内热','外热内冷','嘴硬心软','白切黑','黑切白','笑里藏刀','表面温和实则薄情','表面乖巧实则阴暗','表面斯文实则败类','表面禁欲实则偏执','表面高冷实则纯情','表面散漫实则步步为营','表面玩世不恭实则深情','表面冷淡实则护短','表面佛系实则野心勃勃','表面强势实则缺爱','表面冷静实则易碎','表面优雅实则颓废','表面社恐实则内心戏多','表面毒舌实则兜底','表面精明实则恋爱脑','表面无害实则危险','表面克制实则越界沉沦','表面高傲实则卑微'] },
+      { id: 'flaw', name: '真实缺点', tags: ['回避型依恋','焦虑型依恋','占有欲过强','控制欲极强','嫉妒爱吃飞醋','敏感多疑','缺乏安全感','极度拧巴','口是心非','嘴笨不会哄人','习惯性冷暴力','爱翻旧账记仇','爱试探底线','边界感过强','极度双标','死要面子','傲慢好胜','爱说教爹味重','自我中心','固执钻牛角尖','完美主义洁癖','娇气少爷脾气','精致利己','凉薄缺共情','习惯性隐瞒撒谎','睚眦必报','漠视规则','抠门市侩','暴躁易怒','阴郁厌世','自毁倾向','过度压抑情绪','恶趣味毒舌','重度工作狂','习惯独自扛事','过度内耗','戒备心极强','逃避现实拖延','冲动不计后果','生活白痴','起床气严重','酒品极差','极其挑食','路痴脸盲'] }
+    ]
+  },
+  {
+    key: 'identity',
+    title: '身份与处境',
+    multi: true,
+    linkedToWorld: true,
+    hint: '已根据全局世界观优先置顶对应时代职业',
+    groups: [
+      { id: 'modern', name: '现代常见职业', tags: ['豪门继承人','落魄贵公子','职场高管','投行金融精英','打工人社畜','金牌律师','法医刑警','外科医生','心理医生','高校教授','科研大佬','建筑设计师','艺术家音乐人','古董修复师','米其林主厨','咖啡店或酒吧老板','纹身师','赛车手','机长','消防员','退役特种兵','私人保镖','职业电竞选手','顶流明星','大导演','金牌经纪人','私家侦探','顶尖黑客','黑帮大佬','职业杀手','地下黑市老板','风水师道士','入殓师','大学生学霸','校霸','自由职业者'] },
+      { id: 'republic', name: '民国年代身份', tags: ['军阀少帅','督军','留洋博士','商会会长','报社记者','特务头子','戏班名角','战地医生','帮派老大','地下情报员'] },
+      { id: 'ancient', name: '古风仙侠身份', tags: ['帝王暴君','废太子','摄政王','权臣首辅','锦衣卫督主','少年将军','病弱世子','敌国质子','状元郎','落魄书生','神医毒医','仵作','江湖侠客','魔教教主','正道魁首','第一剑客','杀手阁主','暗卫死士','山贼头子','修仙宗主','高冷师尊','大师兄','魔尊妖皇','鬼王龙君','堕仙','陨落神明','地府判官','驱魔天师'] },
+      { id: 'western', name: '西幻欧风身份', tags: ['帝国皇储','公爵贵族','帝国元帅','圣骑士黑骑士','大魔法师','炼金术士','教皇','堕落天使','恶魔魔王','血族亲王','吸血鬼猎人','狼人首领','深海人鱼','龙族精灵','亡灵法师','吟游诗人','海盗船长'] },
+      { id: 'scifi', name: '科幻末世与无限流', tags: ['星际元帅','星际海盗','机甲驾驶员','联邦指挥官','机械师','赛博改造人','义体医生','疯狂科学家','逃亡实验体','异能局局长','特遣队长','收容所研究员','异常收容物','高级哨兵','顶级向导','末世基地首领','拾荒者','无限流大佬','副本首领','游戏管理员','克系邪神','邪神信徒','时间管理局特工','位面商人'] },
+      { id: 'situation', name: '通用处境补充', tags: ['上位掌权者','幕后操盘手','顶层权贵','体制内精英','普通中产','社会底层挣扎','落魄失势','家道中落','豪门私生子','草根逆袭','寄人篱下','灰色地带','法外狂徒','在逃通缉','阶下囚质子','隐姓埋名大佬','扮猪吃虎','双重身份'] }
+    ]
+  },
+  {
+    key: 'speech',
+    title: '说话风格',
+    multi: true,
+    hint: '对应说话习惯与台词范例',
+    tags: [
+      '惜字如金冷淡','慢条斯理慵懒','散漫松弛','温柔低声轻哄','循循善诱引导','礼貌疏离客气','礼貌带刺挖苦','温润斯文书卷气','古风雅致文绉绉','江湖豪爽粗犷',
+      '接地气烟火大白话','京味或港风方言感','体制内精英腔','逻辑严密专业控','居高临下命令感','毒舌刻薄嘴硬','阴阳怪气反问','痞气油嘴滑舌','钓系语带双关','茶言茶语装乖',
+      '撒娇黏腻直球','实诚笨拙易卡壳','社恐小声','笑眯眯放狠话','敬语藏刀','阴湿低语','疯批跳跃','冷静残忍无波澜','暴躁易怒爱打断','敷衍已读乱回',
+      '玩梗抽象冷笑话','爱起外号喊小朋友','爱留白停顿','欧风贵族腔','机械非人语感','神明俯视口吻','口嫌体正直','一针见血','嘴碎爱操心'
+    ]
+  },
+  {
+    key: 'innerCore',
+    title: '内在精神内核',
+    multi: true,
+    hint: '藏在冰山底下的暗线想法',
+    tags: [
+      '万物皆可等价交换','极度现实权衡利弊','不相信任何真心','靠谁不如靠自己','权力才是唯一安全感','厌恶一切失控','拒绝成为棋子','输不起的野心家','看淡生死随时离场','局外人冷眼旁观',
+      '拒绝产生情感羁绊','认为自己不配被爱','怕失去所以先推开','把温柔当保护色','知世故而不世故','守住底线极重承诺','有恩必还有仇必报','清高傲骨宁折不弯','泥潭里野蛮生长','习惯独自咽下委屈',
+      '及时行乐自由至上','天生反骨热衷破局','混乱中立乐子人','认准一人就是执念','以毁灭和痛苦确认存在','背负负罪感与赎罪','习惯替所有人兜底','差不多得了平凡即幸福','内核极稳通透豁达','看破不说破装糊涂',
+      '谁也不欠谁','非人冷漠观察人类','对世人薄情唯独对你心软','永远给自己留退路'
+    ]
+  },
+  {
+    key: 'relation',
+    title: '双方初始关系',
+    multi: true,
+    hint: '决定开局的绑定方式',
+    tags: [
+      '陌生偶遇','合租室友','对门邻居','房东与租客','青梅竹马','同窗同学','学长学妹','导师或家教与学生','上下级','总裁与秘书',
+      '甲乙方合作','职场竞争对手','商业联姻','先婚后爱','契约假扮情侣','隐婚或塑料夫妻','离婚冷静期','相亲对象','网恋奔现','游戏饭酒搭子',
+      '医生与患者','律师与委托人','心理师与来访者','明星与助理经纪人','黑粉或狗仔与明星','金主与金丝雀','保镖与雇主','债主与欠债人','常客与店主调酒师','借住寄人篱下',
+      '哥哥的朋友','闺蜜的弟弟','前任的死对头或小叔','前任重逢','白月光与替身','初恋久别重逢','双向暗恋未挑明','友情变质','地下恋情','一夜情后重逢',
+      '退婚逃婚替嫁','死对头欢喜冤家','宿敌天敌','塑料盟友共犯','互握把柄互相利用','猎人与猎物','警察与线人或嫌疑人','侦探与委托人','卧底与老大','刺客与目标',
+      '绑匪与人质','看守与阶下囚','敌国质子与皇室','正道与魔头','猎人与非人血族','研究员与实验体','收容员与收容物','伪骨科无血缘兄妹','收养资助与监护','师徒同门',
+      '主仆暗卫','饲主与人外','神明与信徒祭品','恶魔与契约者','创造者与仿生人','玩家与副本首领','穿书者与反派','哨兵与向导','救命恩人','捡到的失忆大佬',
+      '灵魂互换契约绑定','前世今生转世','末世或副本临时队友','现实死对头网上好搭子','被困同一空间的陌生人'
+    ]
+  },
+  {
+    key: 'loveStyle',
+    title: '感情观与相处模式',
+    multi: true,
+    hint: '对应感情观与相处模式栏目',
+    tags: [
+      '纯爱唯一','日久生情','一见钟情','见色起意','蓄谋已久','双向奔赴','势均力敌','引导型恋人','爹系纵容','伴侣式战友',
+      '灵魂智性共鸣','饭搭子烟火气','互怼日常','相爱相杀','成年人极限拉扯','克制又越界','高位者低头','神明跌落神坛','掌控与臣服','训狗博弈',
+      '互相折磨爱恨交织','双向救赎互为软肋','各自独立边界清晰','黏人挂件','极度双标护短','行动派冷脸兜底','嘴硬心软宠溺','沉默暗中守护','隐秘窥伺暗恋','卑微甘愿做替身',
+      '死缠烂打直球','有嘴不误会','嘴甜撒娇绿茶争宠','阴阳怪气吃醋','偏执独占病态依恋','先走肾后走心','假戏真做','权衡利弊后依然选你','浪子回头','戒断反应',
+      '人前不熟人后亲密','只谈风月不谈未来','事业优先顺便爱你','理性分析感性沦陷','吵架绝不隔夜','冷战比谁先低头','明争暗抢雄竞'
+    ]
+  }
+];
+
+/* =========================================================
+   三、全局状态与持久化
+   ========================================================= */
+const STORAGE_KEYS = {
+  settings: 'rp_script_api_settings_v1',
+  template: 'rp_script_template_v1',
+  draft: 'rp_script_draft_v1',
+  library: 'rp_script_library_v1',
+  chat: 'rp_script_chat_v1'
+};
+
+function createEmptyChar(index) {
+  return {
+    id: 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    name: '角色 ' + index,
+    tags: {
+      species: [], vibe: [], personality: [], identity: [],
+      speech: [], innerCore: [], relation: [], loveStyle: []
+    },
+    locks: {}
+  };
+}
+
+function createEmptyDraft() {
+  return {
+    id: 'draft_' + Date.now(),
+    title: '',
+    global: {
+      countMode: ['单男主纯爱'],
+      world: [],
+      tone: [],
+      userRole: [],
+      conflict: [],
+      opening: []
+    },
+    globalLocks: {},
+    extraNotes: '',
+    characters: [createEmptyChar(1)],
+    outline: '',
+    detailRolesPart: '',
+    detailUserPart: '',
+    finalFullText: ''
+  };
+}
+
+const state = {
+  page: 'home',
+  workshopTab: 'global', // 'global' | char.id
+  studioStep: 1,
+  showOnlyDetail: false,
+  allExpanded: false,
+  openCats: { countMode: true, world: true, species: true, vibe: true },
+  activeSubTabs: {},
+  customModalTarget: null,
+  settings: {
+    baseUrl: '',
+    apiKey: '',
+    model: '',
+    models: [],
+    temperature: 0.75,
+    topP: 0.90,
+    maxTokens: 4096,
+    stream: true,
+    connStatus: 'idle' // idle | ok | err
+  },
+  template: { ...DEFAULT_TEMPLATE },
+  currentScript: createEmptyDraft(),
+  library: [],
+  chatHistory: []
+};
+
+function loadAllStorage() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || 'null');
+    if (s) state.settings = { ...state.settings, ...s };
+  } catch (e) {}
+  try {
+    const t = JSON.parse(localStorage.getItem(STORAGE_KEYS.template) || 'null');
+    if (t && t.header) state.template = { ...DEFAULT_TEMPLATE, ...t };
+  } catch (e) {}
+  try {
+    const d = JSON.parse(localStorage.getItem(STORAGE_KEYS.draft) || 'null');
+    if (d && d.global && Array.isArray(d.characters) && d.characters.length) {
+      state.currentScript = { ...createEmptyDraft(), ...d };
+    }
+  } catch (e) {}
+  try {
+    const lib = JSON.parse(localStorage.getItem(STORAGE_KEYS.library) || '[]');
+    if (Array.isArray(lib)) state.library = lib;
+  } catch (e) {}
+  try {
+    const ch = JSON.parse(localStorage.getItem(STORAGE_KEYS.chat) || '[]');
+    if (Array.isArray(ch)) state.chatHistory = ch;
+  } catch (e) {}
+}
+
+function persistDraft() {
+  try { localStorage.setItem(STORAGE_KEYS.draft, JSON.stringify(state.currentScript)); } catch (e) {}
+  updateDraftSummary();
+}
+function persistLibrary() {
+  try { localStorage.setItem(STORAGE_KEYS.library, JSON.stringify(state.library)); } catch (e) {}
+}
+function persistChat() {
+  try { localStorage.setItem(STORAGE_KEYS.chat, JSON.stringify(state.chatHistory)); } catch (e) {}
+}
+
+/* =========================================================
+   四、页面切换与 UI 基础交互
+   ========================================================= */
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+const PAGE_TITLES = {
+  home: '剧本生成库',
+  chat: '聊天脑洞',
+  workshop: '标签工坊',
+  studio: '大纲与细拆',
+  library: '我的剧本库',
+  settings: '接口与模板'
+};
+
+function switchPage(pageName) {
+  state.page = pageName;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + pageName);
+  if (target) target.classList.add('active');
+
+  document.getElementById('topbarTitle').textContent = PAGE_TITLES[pageName] || '剧本生成库';
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    const mapped = (pageName === 'chat' || pageName === 'studio') ? 'workshop' : pageName;
+    btn.classList.toggle('active', btn.dataset.page === mapped);
+  });
+
+  if (pageName === 'home') renderHome();
+  if (pageName === 'workshop') renderWorkshop();
+  if (pageName === 'chat') renderChat();
+  if (pageName === 'studio') renderStudio();
+  if (pageName === 'library') renderLibrary();
+  if (pageName === 'settings') renderSettings();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateTopbarStatus() {
+  const dot = document.getElementById('topStatusDot');
+  const txt = document.getElementById('topModelText');
+  dot.className = 'status-dot ' + (state.settings.connStatus === 'ok' ? 'ok' : state.settings.connStatus === 'err' ? 'err' : '');
+  if (state.settings.model) {
+    txt.textContent = state.settings.model;
+  } else if (state.settings.apiKey) {
+    txt.textContent = '未选模型';
+  } else {
+    txt.textContent = '配置接口';
+  }
+}
+
+/* =========================================================
+   五、首页渲染与三大入口启动
+   ========================================================= */
+function updateDraftSummary() {
+  const g = state.currentScript.global;
+  const gCount = Object.values(g).reduce((a, b) => a + b.length, 0);
+  const cCount = state.currentScript.characters.reduce((sum, c) => sum + Object.values(c.tags).reduce((a, b) => a + b.length, 0), 0);
+  const el = document.getElementById('draftSummaryText');
+  if (!el) return;
+  if (gCount + cCount === 0) {
+    el.textContent = '尚未选择标签，点击直接进入标签工坊';
+  } else {
+    const worldStr = g.world.length ? g.world.slice(0, 2).join(' / ') : '未定世界观';
+    el.textContent = `${worldStr} · ${state.currentScript.characters.length}位角色 · 共选 ${gCount + cCount} 个标签`;
+  }
+}
+
+function renderHome() {
+  updateDraftSummary();
+  const wrap = document.getElementById('homeRecentList');
+  if (!state.library.length) {
+    wrap.innerHTML = `<div style="font-size:12.5px;color:var(--ink-3);padding:8px 0;">还没有保存过的剧本，试试上面的随机或自定剧本吧。</div>`;
+    return;
+  }
+  const recent = state.library.slice(0, 3);
+  wrap.innerHTML = recent.map(item => `
+    <div onclick="loadFromLibrary('${item.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--surface-soft);cursor:pointer;">
+      <div style="min-width:0;flex:1;padding-right:10px;">
+        <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(item.title || '未命名剧本')}</div>
+        <div style="font-size:11.5px;color:var(--ink-3);margin-top:2px;">${escapeHtml((item.world || []).slice(0,2).join(' · ') || '自定世界观')} · ${item.charCount || 1}位男主</div>
+      </div>
+      <span class="badge ${item.hasFull ? 'sage' : 'soft'}">${item.hasFull ? '已成稿' : '大纲中'}</span>
+    </div>
+  `).join('');
+}
+
+function startCustomWorkshop() {
+  state.currentScript = createEmptyDraft();
+  state.workshopTab = 'global';
+  persistDraft();
+  switchPage('workshop');
+  showToast('已创建空白自定问卷');
+}
+
+function startRandomWorkshop() {
+  state.currentScript = createEmptyDraft();
+  state.workshopTab = 'global';
+  randomizeAllUnlocked(true);
+  switchPage('workshop');
+  showToast('程序已随机抽好一套标签，可锁住满意项继续摇');
+}
+
+/* =========================================================
+   六、程序智能随机抽取引擎（绝不走AI，世界观联动合理搭配）
+   ========================================================= */
+function pickRandom(arr, count = 1, exclude = []) {
+  const pool = arr.filter(x => !exclude.includes(x));
+  const res = [];
+  const copy = [...pool];
+  for (let i = 0; i < count && copy.length; i++) {
+    const idx = Math.floor(Math.random() * copy.length);
+    res.push(copy.splice(idx, 1)[0]);
+  }
+  return res;
+}
+
+function detectWorldGroupIds(selectedWorlds) {
+  const worldCat = GLOBAL_CATEGORIES.find(c => c.key === 'world');
+  const ids = new Set();
+  for (const w of selectedWorlds) {
+    for (const g of worldCat.groups) {
+      if (g.tags.includes(w)) {
+        if (g.id === 'apocalypse' || g.id === 'infinite') ids.add('scifi');
+        else ids.add(g.id);
+      }
+    }
+  }
+  return Array.from(ids);
+}
+
+function inferCharCountFromMode(modeStr) {
+  if (!modeStr) return 1;
+  if (modeStr.includes('三男主')) return 3;
+  if (modeStr.includes('双男主') || modeStr.includes('前任与现任') || modeStr.includes('师徒')) return 2;
+  if (modeStr.includes('多男主')) return Math.random() < 0.5 ? 2 : 3;
+  if (modeStr.includes('随机数量')) return 1 + Math.floor(Math.random() * 3);
+  return 1;
+}
+
+function syncCharCountTo(targetCount) {
+  const chars = state.currentScript.characters;
+  while (chars.length < targetCount) {
+    chars.push(createEmptyChar(chars.length + 1));
+  }
+  if (chars.length > targetCount) {
+    chars.splice(targetCount);
+  }
+}
+
+function randomizeCharacterFields(charObj, usedTagsByKey = {}) {
+  const worldIds = detectWorldGroupIds(state.currentScript.global.world);
+  const rawWorlds = state.currentScript.global.world;
+
+  // 1. 物种：结合世界观权重
+  if (!charObj.locks.species) {
+    const speciesAll = CHAR_CATEGORIES.find(c => c.key === 'species').tags;
+    const isModernLike = worldIds.includes('modern') || worldIds.includes('republic');
+    const isABO = rawWorlds.includes('信息素世界观');
+    if (isABO) {
+      charObj.tags.species = pickRandom(['男阿尔法', '男贝塔', '男欧米伽'], 1);
+    } else if (isModernLike && Math.random() < 0.78) {
+      charObj.tags.species = ['人类男性'];
+    } else if (worldIds.includes('ancient')) {
+      charObj.tags.species = pickRandom(['人类男性', '妖鬼精怪', '人外神明'], 1);
+    } else if (worldIds.includes('western')) {
+      charObj.tags.species = pickRandom(['人类男性', '血族狼人', '人外神明', '非人怪物'], 1);
+    } else if (worldIds.includes('scifi')) {
+      charObj.tags.species = pickRandom(['人类男性', '仿生人', '觉醒人工智能', '虫族雄虫', '男阿尔法', '非人怪物'], 1);
+    } else {
+      charObj.tags.species = pickRandom(speciesAll, 1);
+    }
+  }
+
+  // 2. 气质
+  if (!charObj.locks.vibe) {
+    const arr = CHAR_CATEGORIES.find(c => c.key === 'vibe').tags;
+    charObj.tags.vibe = pickRandom(arr, 2, usedTagsByKey.vibe || []);
+  }
+
+  // 3. 性格反差与缺点（1个反差 + 1~2个缺点）
+  if (!charObj.locks.personality) {
+    const pCat = CHAR_CATEGORIES.find(c => c.key === 'personality');
+    const c1 = pickRandom(pCat.groups[0].tags, 1, usedTagsByKey.personality || []);
+    const f1 = pickRandom(pCat.groups[1].tags, Math.random() < 0.55 ? 2 : 1, usedTagsByKey.personality || []);
+    charObj.tags.personality = [...c1, ...f1];
+  }
+
+  // 4. 身份与处境（联动世界观职业 + 1个通用处境）
+  if (!charObj.locks.identity) {
+    const idCat = CHAR_CATEGORIES.find(c => c.key === 'identity');
+    let matchedJobs = [];
+    for (const gid of worldIds) {
+      const grp = idCat.groups.find(g => g.id === gid);
+      if (grp) matchedJobs = matchedJobs.concat(grp.tags);
+    }
+    if (!matchedJobs.length) matchedJobs = idCat.groups[0].tags;
+    const job = pickRandom(matchedJobs, 1, usedTagsByKey.identity || []);
+    const sit = pickRandom(idCat.groups.find(g => g.id === 'situation').tags, 1);
+    charObj.tags.identity = [...job, ...sit];
+  }
+
+  // 5. 说话风格
+  if (!charObj.locks.speech) {
+    const arr = CHAR_CATEGORIES.find(c => c.key === 'speech').tags;
+    charObj.tags.speech = pickRandom(arr, Math.random() < 0.6 ? 2 : 1, usedTagsByKey.speech || []);
+  }
+
+  // 6. 内在精神内核
+  if (!charObj.locks.innerCore) {
+    const arr = CHAR_CATEGORIES.find(c => c.key === 'innerCore').tags;
+    charObj.tags.innerCore = pickRandom(arr, 1, usedTagsByKey.innerCore || []);
+  }
+
+  // 7. 双方初始关系
+  if (!charObj.locks.relation) {
+    const arr = CHAR_CATEGORIES.find(c => c.key === 'relation').tags;
+    charObj.tags.relation = pickRandom(arr, Math.random() < 0.45 ? 2 : 1, usedTagsByKey.relation || []);
+  }
+
+  // 8. 感情观与相处模式
+  if (!charObj.locks.loveStyle) {
+    const arr = CHAR_CATEGORIES.find(c => c.key === 'loveStyle').tags;
+    charObj.tags.loveStyle = pickRandom(arr, Math.random() < 0.6 ? 2 : 1, usedTagsByKey.loveStyle || []);
+  }
+}
+
+function randomizeAllUnlocked(silent = false) {
+  const g = state.currentScript.global;
+  const locks = state.currentScript.globalLocks;
+
+  if (!locks.countMode) {
+    const modes = GLOBAL_CATEGORIES.find(c => c.key === 'countMode').tags;
+    // 适当提升单/双男主常见概率，保留全部可能
+    const r = Math.random();
+    if (r < 0.48) g.countMode = ['单男主纯爱'];
+    else if (r < 0.82) g.countMode = pickRandom(['双男主修罗场','红白玫瑰双男主','兄弟双男主','死对头双男主','前任与现任','师徒或长辈晚辈'], 1);
+    else g.countMode = pickRandom(modes, 1);
+  }
+
+  const targetCount = inferCharCountFromMode(g.countMode[0]);
+  syncCharCountTo(targetCount);
+
+  if (!locks.world) {
+    const wGroups = GLOBAL_CATEGORIES.find(c => c.key === 'world').groups;
+    const primaryGroup = pickRandom(wGroups, 1)[0];
+    const picked = pickRandom(primaryGroup.tags, Math.random() < 0.35 ? 2 : 1);
+    g.world = picked;
+  }
+
+  if (!locks.tone) {
+    g.tone = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === 'tone').tags, 2 + (Math.random() < 0.35 ? 1 : 0));
+  }
+
+  if (!locks.userRole) {
+    g.userRole = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === 'userRole').tags, Math.random() < 0.55 ? 2 : 1);
+  }
+
+  if (!locks.conflict) {
+    g.conflict = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === 'conflict').tags, 2);
+  }
+
+  if (!locks.opening) {
+    g.opening = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === 'opening').tags, 1);
+  }
+
+  const used = { vibe: [], personality: [], identity: [], speech: [], innerCore: [], relation: [], loveStyle: [] };
+  state.currentScript.characters.forEach((ch, idx) => {
+    if (!ch.name || /^角色\s*\d+$/.test(ch.name)) ch.name = '角色 ' + (idx + 1);
+    randomizeCharacterFields(ch, used);
+    Object.keys(used).forEach(k => used[k].push(...(ch.tags[k] || [])));
+  });
+
+  if (state.workshopTab !== 'global' && !state.currentScript.characters.some(c => c.id === state.workshopTab)) {
+    state.workshopTab = 'global';
+  }
+
+  persistDraft();
+  renderWorkshop();
+  if (!silent) showToast('已重新随机抽取未锁定项');
+}
+
+function randomizeSingleCategory(scope, catKey, event) {
+  event.stopPropagation();
+  if (scope === 'global') {
+    const g = state.currentScript.global;
+    if (catKey === 'countMode') {
+      g.countMode = pickRandom(GLOBAL_CATEGORIES[0].tags, 1);
+      syncCharCountTo(inferCharCountFromMode(g.countMode[0]));
+    } else if (catKey === 'world') {
+      const grp = pickRandom(GLOBAL_CATEGORIES[1].groups, 1)[0];
+      g.world = pickRandom(grp.tags, 1);
+    } else {
+      const cat = GLOBAL_CATEGORIES.find(c => c.key === catKey);
+      g[catKey] = pickRandom(cat.tags, catKey === 'opening' ? 1 : 2);
+    }
+  } else {
+    const ch = getCurrentChar();
+    if (!ch) return;
+    const savedLocks = { ...ch.locks };
+    // 临时锁住其他，只摇当前项
+    CHAR_CATEGORIES.forEach(c => { ch.locks[c.key] = (c.key !== catKey); });
+    randomizeCharacterFields(ch, {});
+    ch.locks = savedLocks;
+  }
+  persistDraft();
+  renderWorkshop();
+  showToast('已重摇该模块');
+}
+
+function randomizeSingleCharacter() {
+  const ch = getCurrentChar();
+  if (!ch) return;
+  randomizeCharacterFields(ch, {});
+  persistDraft();
+  renderWorkshop();
+  showToast(`已重摇 ${ch.name} 未锁定项`);
+}
+
+function toggleLock(scope, catKey, event) {
+  event.stopPropagation();
+  if (scope === 'global') {
+    state.currentScript.globalLocks[catKey] = !state.currentScript.globalLocks[catKey];
+  } else {
+    const ch = getCurrentChar();
+    if (!ch) return;
+    ch.locks[catKey] = !ch.locks[catKey];
+  }
+  persistDraft();
+  renderWorkshop();
+}
+
+/* =========================================================
+   七、标签确认工坊渲染与交互
+   ========================================================= */
+function getCurrentChar() {
+  return state.currentScript.characters.find(c => c.id === state.workshopTab) || null;
+}
+
+function countGlobalTags() {
+  return Object.values(state.currentScript.global).reduce((a, b) => a + b.length, 0);
+}
+function countCharTags(ch) {
+  return Object.values(ch.tags).reduce((a, b) => a + b.length, 0);
+}
+
+function renderWorkshop() {
+  // 1. 顶部横滑分组胶囊
+  const rail = document.getElementById('workshopRail');
+  const gCount = countGlobalTags();
+  let html = `
+    <button class="rail-pill ${state.workshopTab === 'global' ? 'active' : ''}" onclick="setWorkshopTab('global')">
+      <span class="rail-sub">共用</span>
+      <span class="rail-main">全局</span>
+      <span class="rail-count">${gCount} 项</span>
+    </button>
+  `;
+  state.currentScript.characters.forEach((ch, idx) => {
+    const cnt = countCharTags(ch);
+    html += `
+      <button class="rail-pill ${state.workshopTab === ch.id ? 'active' : ''}" onclick="setWorkshopTab('${ch.id}')">
+        <span class="rail-sub">男主${idx + 1}</span>
+        <span class="rail-main">${escapeHtml(ch.name || ('角色 ' + (idx + 1)))}</span>
+        <span class="rail-count">${cnt} 项</span>
+      </button>
+    `;
+  });
+  html += `
+    <button class="rail-pill add-pill" onclick="addCharacter()">
+      <span class="rail-sub">新增</span>
+      <span class="rail-main">+</span>
+      <span class="rail-count">角色</span>
+    </button>
+  `;
+  rail.innerHTML = html;
+
+  // 2. 总标签数
+  const totalAll = gCount + state.currentScript.characters.reduce((s, c) => s + countCharTags(c), 0);
+  document.getElementById('totalTagCountBadge').textContent = `总计 ${totalAll} 项`;
+
+  // 3. 角色信息头 / 额外脑洞框显隐
+  const charMeta = document.getElementById('charMetaSection');
+  const extraCard = document.getElementById('extraNoteCard');
+  const container = document.getElementById('workshopCategories');
+
+  if (state.workshopTab === 'global') {
+    charMeta.style.display = 'none';
+    extraCard.style.display = 'block';
+    document.getElementById('extraNotesInput').value = state.currentScript.extraNotes || '';
+    container.innerHTML = GLOBAL_CATEGORIES.map(cat => renderCategoryCard('global', cat, state.currentScript.global[cat.key] || [], !!state.currentScript.globalLocks[cat.key])).join('');
+  } else {
+    const ch = getCurrentChar();
+    if (!ch) { state.workshopTab = 'global'; renderWorkshop(); return; }
+    charMeta.style.display = 'block';
+    extraCard.style.display = 'none';
+    document.getElementById('charNameInput').value = ch.name || '';
+    document.getElementById('deleteCharBtn').style.display = state.currentScript.characters.length > 1 ? 'inline-flex' : 'none';
+    container.innerHTML = CHAR_CATEGORIES.map(cat => renderCategoryCard('char', cat, ch.tags[cat.key] || [], !!ch.locks[cat.key])).join('');
+  }
+}
+
+function renderCategoryCard(scope, cat, selectedArr, isLocked) {
+  const isOpen = !!state.openCats[cat.key];
+  const preview = selectedArr.length ? selectedArr.join(' · ') : (cat.hint || '点击展开挑选');
+
+  // 收集该类目下所有预设标签，用于识别用户自定义词条
+  const presetSet = new Set();
+  if (cat.tags) cat.tags.forEach(t => presetSet.add(t));
+  if (cat.groups) cat.groups.forEach(g => g.tags.forEach(t => presetSet.add(t)));
+  const customSelected = selectedArr.filter(t => !presetSet.has(t));
+
+  let bodyHtml = '';
+  if (cat.groups) {
+    let groups = [...cat.groups];
+    let matchedIds = [];
+    if (cat.linkedToWorld) {
+      matchedIds = detectWorldGroupIds(state.currentScript.global.world);
+      // 将匹配世界观的职业分组置顶（通用处境保持最后）
+      const matched = groups.filter(g => matchedIds.includes(g.id));
+      const others = groups.filter(g => !matchedIds.includes(g.id) && g.id !== 'situation');
+      const sit = groups.find(g => g.id === 'situation');
+      groups = [...matched, ...others, ...(sit ? [sit] : [])];
+    }
+
+    const tabKey = scope + '_' + cat.key;
+    let activeGrpId = state.activeSubTabs[tabKey];
+    if (!activeGrpId || !groups.some(g => g.id === activeGrpId)) {
+      activeGrpId = groups[0].id;
+    }
+
+    // 性格反差与缺点同时展示或分组切换：这里统一用清爽子标签条，点选极快
+    bodyHtml += `<div class="sub-group-bar">` + groups.map(g => {
+      const isMatch = matchedIds.includes(g.id);
+      const countInGrp = g.tags.filter(t => selectedArr.includes(t)).length;
+      return `<button class="sub-tab ${activeGrpId === g.id ? 'active' : ''} ${isMatch ? 'match-hint' : ''}" onclick="setSubTab('${tabKey}','${g.id}')">${escapeHtml(g.name)}${isMatch ? ' · 推荐' : ''}${countInGrp ? ` (${countInGrp})` : ''}</button>`;
+    }).join('') + `</div>`;
+
+    const activeGrp = groups.find(g => g.id === activeGrpId) || groups[0];
+    bodyHtml += `<div class="chip-wrap">` + activeGrp.tags.map(tag => {
+      const sel = selectedArr.includes(tag);
+      return `<button class="chip ${sel ? 'selected' : ''}" onclick="toggleTag('${scope}','${cat.key}',${cat.multi},'${escapeJs(tag)}')">${escapeHtml(tag)}</button>`;
+    }).join('');
+    bodyHtml += renderCustomChipsHtml(scope, cat.key, customSelected);
+    bodyHtml += `</div>`;
+  } else {
+    bodyHtml += `<div class="chip-wrap">` + cat.tags.map(tag => {
+      const sel = selectedArr.includes(tag);
+      return `<button class="chip ${sel ? 'selected' : ''}" onclick="toggleTag('${scope}','${cat.key}',${cat.multi},'${escapeJs(tag)}')">${escapeHtml(tag)}</button>`;
+    }).join('');
+    bodyHtml += renderCustomChipsHtml(scope, cat.key, customSelected);
+    bodyHtml += `</div>`;
+  }
+
+  return `
+    <div class="cat-card ${isOpen ? 'open' : ''}">
+      <div class="cat-head" onclick="toggleCatOpen('${cat.key}')">
+        <div class="cat-head-left">
+          <div class="cat-title-row">
+            <span class="cat-title">${escapeHtml(cat.title)}</span>
+            ${selectedArr.length ? `<span class="badge soft">${selectedArr.length}</span>` : ''}
+          </div>
+          <div class="cat-preview ${selectedArr.length ? 'has-val' : ''}">${escapeHtml(preview)}</div>
+        </div>
+        <div class="cat-tools">
+          <button class="mini-tool ${isLocked ? 'locked' : ''}" title="${isLocked ? '已锁定，重摇时保留' : '锁定此项'}" onclick="toggleLock('${scope}','${cat.key}',event)">
+            ${isLocked
+              ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`
+              : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`}
+          </button>
+          <button class="mini-tool" title="单摇此模块" onclick="randomizeSingleCategory('${scope}','${cat.key}',event)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>
+          </button>
+          <span class="cat-chevron">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </div>
+      </div>
+      <div class="cat-body">${bodyHtml}</div>
+    </div>
+  `;
+}
+
+function renderCustomChipsHtml(scope, catKey, customSelected) {
+  let out = customSelected.map(t =>
+    `<button class="chip custom-tag-selected" onclick="toggleTag('${scope}','${catKey}',true,'${escapeJs(t)}')">${escapeHtml(t)} ×</button>`
+  ).join('');
+  out += `<button class="chip custom-chip" onclick="openCustomTagModal('${scope}','${catKey}')">+ 自定义</button>`;
+  return out;
+}
+
+function setWorkshopTab(tabId) {
+  state.workshopTab = tabId;
+  renderWorkshop();
+}
+
+function toggleCatOpen(key) {
+  state.openCats[key] = !state.openCats[key];
+  renderWorkshop();
+}
+
+function toggleExpandAll() {
+  state.allExpanded = !state.allExpanded;
+  const list = state.workshopTab === 'global' ? GLOBAL_CATEGORIES : CHAR_CATEGORIES;
+  list.forEach(c => { state.openCats[c.key] = state.allExpanded; });
+  renderWorkshop();
+}
+
+function setSubTab(tabKey, grpId) {
+  state.activeSubTabs[tabKey] = grpId;
+  renderWorkshop();
+}
+
+function toggleTag(scope, catKey, isMulti, tag) {
+  let arr;
+  if (scope === 'global') {
+    arr = state.currentScript.global[catKey] || (state.currentScript.global[catKey] = []);
+  } else {
+    const ch = getCurrentChar();
+    if (!ch) return;
+    arr = ch.tags[catKey] || (ch.tags[catKey] = []);
+  }
+
+  const idx = arr.indexOf(tag);
+  if (idx >= 0) {
+    arr.splice(idx, 1);
+  } else {
+    if (!isMulti) arr.length = 0;
+    arr.push(tag);
+  }
+
+  if (scope === 'global' && catKey === 'countMode' && arr.length) {
+    const targetCount = inferCharCountFromMode(arr[0]);
+    if (targetCount > state.currentScript.characters.length) {
+      syncCharCountTo(targetCount);
+      showToast(`已为你自动建好 ${targetCount} 个角色标签页`);
+    }
+  }
+
+  persistDraft();
+  renderWorkshop();
+}
+
+function addCharacter() {
+  const nextIdx = state.currentScript.characters.length + 1;
+  const ch = createEmptyChar(nextIdx);
+  state.currentScript.characters.push(ch);
+  state.workshopTab = ch.id;
+  persistDraft();
+  renderWorkshop();
+  showToast(`已添加 ${ch.name}`);
+}
+
+function deleteCurrentCharacter() {
+  if (state.currentScript.characters.length <= 1) {
+    showToast('至少需要保留一位角色');
+    return;
+  }
+  const idx = state.currentScript.characters.findIndex(c => c.id === state.workshopTab);
+  if (idx >= 0) {
+    state.currentScript.characters.splice(idx, 1);
+    state.workshopTab = 'global';
+    persistDraft();
+    renderWorkshop();
+    showToast('已删除该角色');
+  }
+}
+
+function updateCurrentCharName(val) {
+  const ch = getCurrentChar();
+  if (!ch) return;
+  ch.name = val;
+  persistDraft();
+  // 只更新顶部对应胶囊文字，避免打断输入焦点
+  const railBtns = document.querySelectorAll('#workshopRail .rail-pill');
+  const idx = state.currentScript.characters.findIndex(c => c.id === ch.id);
+  if (idx >= 0 && railBtns[idx + 1]) {
+    railBtns[idx + 1].querySelector('.rail-main').textContent = val || ('角色 ' + (idx + 1));
+  }
+}
+
+function updateExtraNotes(val) {
+  state.currentScript.extraNotes = val;
+  persistDraft();
+}
+
+function clearCurrentTab() {
+  if (state.workshopTab === 'global') {
+    Object.keys(state.currentScript.global).forEach(k => state.currentScript.global[k] = []);
+    state.currentScript.extraNotes = '';
+  } else {
+    const ch = getCurrentChar();
+    if (ch) Object.keys(ch.tags).forEach(k => ch.tags[k] = []);
+  }
+  persistDraft();
+  renderWorkshop();
+  showToast('已清空当前页标签');
+}
+
+/* 自定义标签弹窗 */
+function openCustomTagModal(scope, catKey) {
+  state.customModalTarget = { scope, catKey };
+  document.getElementById('customTagInput').value = '';
+  document.getElementById('customTagModal').classList.add('show');
+  setTimeout(() => document.getElementById('customTagInput').focus(), 60);
+}
+function closeCustomTagModal() {
+  document.getElementById('customTagModal').classList.remove('show');
+  state.customModalTarget = null;
+}
+function confirmAddCustomTag() {
+  const raw = document.getElementById('customTagInput').value.trim();
+  if (!raw || !state.customModalTarget) return closeCustomTagModal();
+  const items = raw.split(/[，,、\n]+/).map(s => s.trim()).filter(Boolean);
+  const { scope, catKey } = state.customModalTarget;
+  const arr = scope === 'global' ? state.currentScript.global[catKey] : getCurrentChar().tags[catKey];
+  items.forEach(item => { if (!arr.includes(item)) arr.push(item); });
+  persistDraft();
+  closeCustomTagModal();
+  renderWorkshop();
+  showToast(`已添加 ${items.length} 个自定义标签`);
+}
+
+/* =========================================================
+   八、OpenAI 兼容 API 调用核心（支持流式与非流式）
+   ========================================================= */
+function getNormalizedBaseUrl() {
+  let u = (state.settings.baseUrl || '').trim().replace(/\/+$/, '');
+  return u;
+}
+
+function ensureApiReady() {
+  if (!getNormalizedBaseUrl() || !state.settings.apiKey || !state.settings.model) {
+    showToast('请先在设置页填写接口地址、Key 并获取模型');
+    switchPage('settings');
+    return false;
+  }
+  return true;
+}
+
+async function callLLM(messages, { onChunk = null, maxTokens = null, temperature = null, streamOverride = null } = {}) {
+  const baseUrl = getNormalizedBaseUrl();
+  const useStream = streamOverride !== null ? streamOverride : !!state.settings.stream;
+  const body = {
+    model: state.settings.model,
+    messages,
+    temperature: temperature !== null ? temperature : Number(state.settings.temperature),
+    top_p: Number(state.settings.topP),
+    max_tokens: maxTokens !== null ? maxTokens : Number(state.settings.maxTokens),
+    stream: useStream
+  };
+
+  const resp = await fetch(`${baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${state.settings.apiKey.trim()}`
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => '');
+    throw new Error(`接口返回 ${resp.status}：${errText.slice(0, 160)}`);
+  }
+
+  if (!useStream) {
+    const data = await resp.json();
+    const text = data.choices?.[0]?.message?.content || '';
+    if (onChunk) onChunk(text);
+    return text;
+  }
+
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+  let fullText = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('data:')) continue;
+      const payload = trimmed.slice(5).trim();
+      if (payload === '[DONE]') continue;
+      try {
+        const json = JSON.parse(payload);
+        const delta = json.choices?.[0]?.delta?.content || '';
+        if (delta) {
+          fullText += delta;
+          if (onChunk) onChunk(fullText);
+        }
+      } catch (e) {}
+    }
+  }
+  return fullText;
+}
+
+/* =========================================================
+   九、聊天脑洞与一键提取标签
+   ========================================================= */
+function renderChat() {
+  const wrap = document.getElementById('chatMessages');
+  if (!state.chatHistory.length) {
+    wrap.innerHTML = `
+      <div class="msg-row ai">
+        <div class="msg-bubble">你好呀，告诉我你想玩什么类型的角色扮演脑洞。比如世界观、想要几个男主、偏虐还是日常烟火气、或者任何一闪而过的画面。聊顺了点下面的一键提取标签，我直接帮你把十二大类标签挑好送进工坊。</div>
+      </div>
+    `;
+    return;
+  }
+  wrap.innerHTML = state.chatHistory.map(m => `
+    <div class="msg-row ${m.role === 'user' ? 'user' : 'ai'}">
+      <div class="msg-bubble">${escapeHtml(m.content)}</div>
+    </div>
+  `).join('');
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function clearChatHistory() {
+  state.chatHistory = [];
+  persistChat();
+  renderChat();
+  showToast('对话已清空');
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!ensureApiReady()) return;
+
+  input.value = '';
+  state.chatHistory.push({ role: 'user', content: text });
+  state.chatHistory.push({ role: 'assistant', content: '正在构思...' });
+  renderChat();
+
+  const sys = {
+    role: 'system',
+    content: '你是专业的女性向角色扮演剧本脑洞策划师。你的任务是陪用户轻松发散灵感，帮她细化世界观、角色反差、人物关系拉扯感和开局切入点。严禁写到大结局，保持回复精炼有画面感，拒绝套路烂梗和说教，自然提出一两个有趣的脑洞方向供用户挑选。'
+  };
+  const sendMsgs = [sys, ...state.chatHistory.slice(0, -1)];
+  const aiIdx = state.chatHistory.length - 1;
+
+  document.getElementById('sendChatBtn').disabled = true;
+  try {
+    const reply = await callLLM(sendMsgs, {
+      onChunk: (partial) => {
+        state.chatHistory[aiIdx].content = partial;
+        renderChat();
+      }
+    });
+    state.chatHistory[aiIdx].content = reply;
+    persistChat();
+    renderChat();
+  } catch (err) {
+    state.chatHistory[aiIdx].content = '生成失败：' + err.message;
+    renderChat();
+  } finally {
+    document.getElementById('sendChatBtn').disabled = false;
+  }
+}
+
+async function extractTagsFromChat() {
+  if (!state.chatHistory.length) {
+    showToast('先随便聊几句你的想法吧');
+    return;
+  }
+  if (!ensureApiReady()) return;
+
+  const btn = document.getElementById('extractTagsBtn');
+  btn.disabled = true;
+  btn.textContent = '正在提取并匹配标签...';
+
+  const globalCatalog = GLOBAL_CATEGORIES.map(c => {
+    const all = c.tags ? c.tags : c.groups.flatMap(g => g.tags);
+    return `${c.key}(${c.title}): ${all.join('、')}`;
+  }).join('\n');
+
+  const charCatalog = CHAR_CATEGORIES.map(c => {
+    const all = c.tags ? c.tags : c.groups.flatMap(g => g.tags);
+    return `${c.key}(${c.title}): ${all.join('、')}`;
+  }).join('\n');
+
+  const prompt = `请根据以下聊天记录，为用户提取并匹配对应的角色扮演剧本标签。
+必须优先从下面给出的词库中精准原样挑选；如果聊到了词库里没有的具体脑洞或细节，请放进 extraNotes 字段里，不要丢失任何灵感。
+如果聊到了多个男主，请在 characters 数组里分别建好对应数量的角色对象并区分各自的标签。
+
+全局词库：
+${globalCatalog}
+
+单角色词库：
+${charCatalog}
+
+请只输出严格合法的 JSON，不要输出任何额外说明或代码块标记，结构如下：
+{
+  "global": {
+    "countMode": ["单男主纯爱"],
+    "world": [],
+    "tone": [],
+    "userRole": [],
+    "conflict": [],
+    "opening": []
+  },
+  "extraNotes": "词库外的具体脑洞与要求",
+  "characters": [
+    {
+      "name": "角色 1",
+      "tags": {
+        "species": [],
+        "vibe": [],
+        "personality": [],
+        "identity": [],
+        "speech": [],
+        "innerCore": [],
+        "relation": [],
+        "loveStyle": []
+      }
+    }
+  ]
+}`;
+
+  try {
+    const convo = state.chatHistory.map(m => `${m.role === 'user' ? '用户' : '策划'}: ${m.content}`).join('\n');
+    const raw = await callLLM([
+      { role: 'system', content: '你是精准的数据提取助手，只输出严格 JSON。' },
+      { role: 'user', content: prompt + '\n\n聊天记录如下：\n' + convo }
+    ], { streamOverride: false, temperature: 0.2 });
+
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('未能解析出有效标签数据');
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    const nextDraft = createEmptyDraft();
+    if (parsed.global) {
+      Object.keys(nextDraft.global).forEach(k => {
+        if (Array.isArray(parsed.global[k])) nextDraft.global[k] = parsed.global[k].filter(Boolean);
+      });
+    }
+    if (parsed.extraNotes) nextDraft.extraNotes = String(parsed.extraNotes);
+    if (Array.isArray(parsed.characters) && parsed.characters.length) {
+      nextDraft.characters = parsed.characters.map((c, idx) => {
+        const nc = createEmptyChar(idx + 1);
+        nc.name = c.name || ('角色 ' + (idx + 1));
+        if (c.tags) {
+          Object.keys(nc.tags).forEach(k => {
+            if (Array.isArray(c.tags[k])) nc.tags[k] = c.tags[k].filter(Boolean);
+          });
+        }
+        return nc;
+      });
+    }
+
+    state.currentScript = nextDraft;
+    state.workshopTab = 'global';
+    persistDraft();
+    switchPage('workshop');
+    showToast('标签已自动勾选完毕，请你核对确认');
+  } catch (err) {
+    showToast('提取失败：' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '一键提取标签到工坊';
+  }
+}
+
+/* =========================================================
+   十、大纲打磨 -> 细拆设定 -> 固定模板自动拼装
+   ========================================================= */
+function buildTagPromptSummary() {
+  const g = state.currentScript.global;
+  const gLines = GLOBAL_CATEGORIES.map(c => {
+    const vals = g[c.key] || [];
+    return `${c.title}：${vals.length ? vals.join('、') : '自由发挥'}`;
+  });
+  if (state.currentScript.extraNotes.trim()) {
+    gLines.push(`用户额外脑洞与补充：${state.currentScript.extraNotes.trim()}`);
+  }
+
+  const cLines = state.currentScript.characters.map((ch, idx) => {
+    const lines = CHAR_CATEGORIES.map(c => {
+      const vals = ch.tags[c.key] || [];
+      return `  ${c.title}：${vals.length ? vals.join('、') : '自由发挥'}`;
+    });
+    return `【${ch.name || ('角色 ' + (idx + 1))}】\n` + lines.join('\n');
+  });
+
+  return `一、全局设定\n${gLines.join('\n')}\n\n二、角色设定标签（共 ${state.currentScript.characters.length} 位主要角色，请务必严格区分各自性格、身份与关系，不要混淆）\n${cLines.join('\n\n')}`;
+}
+
+function goGenerateOutline() {
+  const total = countGlobalTags() + state.currentScript.characters.reduce((s, c) => s + countCharTags(c), 0);
+  if (total === 0 && !state.currentScript.extraNotes.trim()) {
+    showToast('请先挑选至少几个标签，或点重摇随机生成');
+    return;
+  }
+  state.studioStep = 1;
+  switchPage('studio');
+  if (!state.currentScript.outline.trim()) {
+    generateOutline(false);
+  }
+}
+
+function renderStudio() {
+  document.getElementById('stepBtn1').classList.toggle('active', state.studioStep === 1);
+  document.getElementById('stepBtn2').classList.toggle('active', state.studioStep === 2);
+  document.getElementById('studioStep1').style.display = state.studioStep === 1 ? 'block' : 'none';
+  document.getElementById('studioStep2').style.display = state.studioStep === 2 ? 'block' : 'none';
+
+  document.getElementById('scriptTitleInput').value = state.currentScript.title || '';
+  document.getElementById('outlineEditor').value = state.currentScript.outline || '';
+  syncFinalEditorDisplay();
+}
+
+function switchStudioStep(step) {
+  state.studioStep = step;
+  renderStudio();
+}
+
+function setStudioLoading(loading, text = '生成中...') {
+  const el = document.getElementById('studioLoading');
+  el.style.display = loading ? 'inline-flex' : 'none';
+  document.getElementById('studioLoadingText').textContent = text;
+}
+
+async function generateOutline(isRevise = false) {
+  if (!ensureApiReady()) return;
+
+  const reviseNote = isRevise ? document.getElementById('outlineReviseInput').value.trim() : '';
+  if (isRevise && !reviseNote) {
+    showToast('请先输入微调修改意见');
+    return;
+  }
+
+  const tagSummary = buildTagPromptSummary();
+  const sysPrompt = `你是一位擅长创作高质感、强活人感、反套路角色扮演剧本的资深编剧。
+请根据用户敲定的标签，生成一份用于角色扮演起手式的故事大纲。
+
+必须严格遵守以下创作铁律：
+1、绝对禁止写到大结局，也不要把中后期感情线和真相全部剧透写死！角色扮演的核心魅力是只把舞台搭好、把人物拉扯感和开局悬念埋足，后面的发展全部留给玩家亲自去玩。
+2、极度强调活人感、真实生活细节与人物反差，拒绝狗血霸总模板、廉价网文套话和空洞形容词。
+3、如果包含多位角色，必须明确区分每位角色的立场、与用户的差异化关系，写出修罗场或暗流涌动的空间。
+4、输出纯文本清晰排版，不使用多余星号和繁杂符号。第一行请单独写：标题：XXX（给故事起一个有电影感或小说感的好名字），空一行后依次呈现：世界观与当下切面、人物关系与暗涌张力、用户的入局处境、开局起手式设计。`;
+
+  const userPrompt = isRevise
+    ? `原始标签设定如下：\n${tagSummary}\n\n当前版本大纲：\n${state.currentScript.outline}\n\n请根据以下修改意见对大纲进行局部改写与优化（依然严禁写到大结局）：\n${reviseNote}`
+    : `请根据以下已确认的标签，生成故事大纲：\n\n${tagSummary}`;
+
+  setStudioLoading(true, isRevise ? '正在微调大纲...' : '正在构思大纲...');
+  const editor = document.getElementById('outlineEditor');
+
+  try {
+    const out = await callLLM([
+      { role: 'system', content: sysPrompt },
+      { role: 'user', content: userPrompt }
+    ], {
+      onChunk: (partial) => {
+        state.currentScript.outline = partial;
+        editor.value = partial;
+      }
+    });
+    state.currentScript.outline = out.trim();
+    // 自动提取标题
+    const titleMatch = out.match(/标题[：:]\s*([^\n]+)/);
+    if (titleMatch && !state.currentScript.title) {
+      state.currentScript.title = titleMatch[1].replace(/[《》【】*]/g, '').trim();
+      document.getElementById('scriptTitleInput').value = state.currentScript.title;
+    }
+    if (isRevise) document.getElementById('outlineReviseInput').value = '';
+    persistDraft();
+    showToast('故事大纲已就绪，可自由修改后再细拆');
+  } catch (err) {
+    showToast('大纲生成失败：' + err.message);
+  } finally {
+    setStudioLoading(false);
+  }
+}
+
+function assembleCompleteScript(rolesText, userAndOpeningText) {
+  const parts = [
+    state.template.header.trim(),
+    rolesText.trim(),
+    state.template.middle.trim(),
+    userAndOpeningText.trim(),
+    state.template.footer.trim()
+  ].filter(Boolean);
+  return parts.join('\n\n\n');
+}
+
+function syncFinalEditorDisplay() {
+  const editor = document.getElementById('finalScriptEditor');
+  const btn = document.getElementById('viewModeBtn');
+  if (state.showOnlyDetail) {
+    btn.textContent = '看完整拼装';
+    const combinedDetail = [state.currentScript.detailRolesPart, state.currentScript.detailUserPart].filter(Boolean).join('\n\n');
+    editor.value = combinedDetail;
+  } else {
+    btn.textContent = '仅看细拆';
+    editor.value = state.currentScript.finalFullText || '';
+  }
+}
+
+function toggleFinalViewMode() {
+  state.showOnlyDetail = !state.showOnlyDetail;
+  syncFinalEditorDisplay();
+}
+
+function onFinalEditorInput(val) {
+  if (!state.showOnlyDetail) {
+    state.currentScript.finalFullText = val;
+    persistDraft();
+  }
+}
+
+async function generateFullDetails() {
+  if (!state.currentScript.outline.trim()) {
+    showToast('请先生成或填写故事大纲');
+    return;
+  }
+  if (!ensureApiReady()) return;
+
+  state.studioStep = 2;
+  state.showOnlyDetail = false;
+  renderStudio();
+  setStudioLoading(true, '正在按文档框架细拆人物与开场...');
+
+  const charCount = state.currentScript.characters.length;
+  const multiNote = charCount > 1
+    ? `本次剧本包含 ${charCount} 位主要角色，请在角色设定部分分别完整写出每一位角色的全部字段（用“角色设定（角色一：姓名）”和“角色设定（角色二：姓名）”区分），绝不能合并简写。`
+    : '请严格输出以下角色设定全部字段。';
+
+  const sysPrompt = `你是一位顶级的角色扮演设定师。你需要根据已确认的标签与故事大纲，严格按照指定字段进行深度细拆。
+写作要求：
+1、极强活人感、反套路、去网文廉价辞藻，每个角色要有真实缺点、日常小习惯和鲜活语感。
+2、“内在精神想法”必须先用一句极实在的大白话点破他对世界和人际关系的底层看法，并保留冰山暗线提醒。
+3、“说话习惯与台词范例”必须给出3到5句贴合他平时说话口吻的真实短句范例，拒绝公关腔和翻译腔。
+4、“开场剧情”要写出极具画面感和动作留白的开局起手式，采用第三人称白描，严禁代写用户的任何台词、心理、动作或决定，在恰好需要用户做出反应或表态的瞬间自然停笔。
+5、输出纯文本，严禁使用 Markdown 的 # 标题、** 加粗符号或表格。
+6、请务必在“角色设定”全部写完之后、写“用户的故事背景”之前，单独输出一行分隔标记：===SPLIT_USER_PART=== 以便系统将中间的文字输出排版要求自动精准插入。`;
+
+  const userPrompt = `【已确认标签】
+${buildTagPromptSummary()}
+
+【已确认故事大纲】
+${state.currentScript.outline}
+
+【严格输出格式要求】
+${multiNote}
+
+角色设定
+姓名：
+年龄：
+身高：
+职业&身份：
+外貌&神态：
+身材&动作：
+性格&缺点：
+不同情绪下的反应：
+感情观与相处模式：
+说话习惯与台词范例：
+内在精神想法：
+（先用一句很实在的大白话，概括他平时怎么看待人情世故、努力、得失或者人与人的关系。并附注：这部分是藏在冰山底下的暗线，只用来影响他的潜意识、决定和微小的情绪起伏，严禁角色在平时聊天里动不动就剖析自己，把这些内心想法像念台词一样直白地说给用户听。真正迷人的精神内核，是让你在相处中一点点自己品出来、摸出来的，而不是他自己举着喇叭告诉你的。）
+他的故事：
+
+===SPLIT_USER_PART===
+
+用户的故事背景
+（贴合大纲与用户身份定位，交代用户在当前世界里的处境、身份和与角色的渊源，保留玩家可自由发挥的空间）
+
+用户的补充
+（留空或给出一行简短提示，方便玩家开玩前自己加私有设定）
+
+开场剧情
+（第一行按“时间 空格 天气 空格 地点”格式起笔，空一行后进入极具画面感的纯文本开局，精准停在需要用户接话或行动的节点，绝不代写用户）`;
+
+  const editor = document.getElementById('finalScriptEditor');
+  document.getElementById('startDetailBtn').disabled = true;
+
+  try {
+    const raw = await callLLM([
+      { role: 'system', content: sysPrompt },
+      { role: 'user', content: userPrompt }
+    ], {
+      onChunk: (partial) => {
+        editor.value = partial;
+      }
+    });
+
+    let rolesPart = raw;
+    let userPart = '';
+    if (raw.includes('===SPLIT_USER_PART===')) {
+      const sp = raw.split('===SPLIT_USER_PART===');
+      rolesPart = sp[0].trim();
+      userPart = sp.slice(1).join('\n\n').trim();
+    } else {
+      const fallbackIdx = raw.indexOf('用户的故事背景');
+      if (fallbackIdx > 0) {
+        rolesPart = raw.slice(0, fallbackIdx).trim();
+        userPart = raw.slice(fallbackIdx).trim();
+      }
+    }
+
+    state.currentScript.detailRolesPart = rolesPart;
+    state.currentScript.detailUserPart = userPart;
+    state.currentScript.finalFullText = assembleCompleteScript(rolesPart, userPart);
+
+    persistDraft();
+    syncFinalEditorDisplay();
+    saveCurrentToLibrary(true);
+    showToast('细拆完成，已无缝拼装 2.0 固定指令并自动存档');
+  } catch (err) {
+    showToast('细拆生成失败：' + err.message);
+  } finally {
+    setStudioLoading(false);
+    document.getElementById('startDetailBtn').disabled = false;
+  }
+}
+
+/* =========================================================
+   十一、一键复制、TXT 导出与纯前端零依赖原生 DOCX 生成器
+   ========================================================= */
+function getExportFilename(ext) {
+  const title = (state.currentScript.title || '角色扮演剧本').replace(/[\\/:*?"<>|]/g, '').trim();
+  return `${title || '角色扮演剧本'}.${ext}`;
+}
+
+async function copyTextSafe(text) {
+  if (!text) return showToast('暂无可复制内容');
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('已复制完整剧本到剪贴板');
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('已复制完整剧本到剪贴板');
+  }
+}
+
+function copyFinalScript() {
+  const txt = state.currentScript.finalFullText || document.getElementById('finalScriptEditor').value;
+  copyTextSafe(txt);
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 500);
+}
+
+function exportFinalTxt(customText = null, customTitle = null) {
+  const txt = customText || state.currentScript.finalFullText || document.getElementById('finalScriptEditor').value;
+  if (!txt.trim()) return showToast('暂无可导出内容');
+  const blob = new Blob(['\uFEFF' + txt], { type: 'text/plain;charset=utf-8' });
+  const name = customTitle ? `${customTitle.replace(/[\\/:*?"<>|]/g, '')}.txt` : getExportFilename('txt');
+  downloadBlob(blob, name);
+  showToast('已导出 TXT 文件');
+}
+
+/* 纯原生零依赖 ZIP/DOCX 打包（Stored模式 + 标准 CRC32，兼容 Word / WPS / 手机文档） */
+const CRC32_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[i] = c >>> 0;
+  }
+  return t;
+})();
+
+function crc32(bytes) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) c = CRC32_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+function createStoredZip(files) {
+  const enc = new TextEncoder();
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+
+  for (const f of files) {
+    const nameBytes = enc.encode(f.name);
+    const dataBytes = typeof f.content === 'string' ? enc.encode(f.content) : f.content;
+    const crc = crc32(dataBytes);
+    const size = dataBytes.length;
+
+    const lh = new Uint8Array(30 + nameBytes.length);
+    const lv = new DataView(lh.buffer);
+    lv.setUint32(0, 0x04034b50, true);
+    lv.setUint16(4, 20, true);
+    lv.setUint16(6, 0x0800, true);
+    lv.setUint16(8, 0, true);
+    lv.setUint16(10, 0, true);
+    lv.setUint16(12, 0, true);
+    lv.setUint32(14, crc, true);
+    lv.setUint32(18, size, true);
+    lv.setUint32(22, size, true);
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true);
+    lh.set(nameBytes, 30);
+
+    localParts.push(lh, dataBytes);
+
+    const ch = new Uint8Array(46 + nameBytes.length);
+    const cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0x0800, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, size, true);
+    cv.setUint32(24, size, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, offset, true);
+    ch.set(nameBytes, 46);
+    centralParts.push(ch);
+
+    offset += lh.length + dataBytes.length;
+  }
+
+  const centralSize = centralParts.reduce((s, b) => s + b.length, 0);
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, files.length, true);
+  ev.setUint16(10, files.length, true);
+  ev.setUint32(12, centralSize, true);
+  ev.setUint32(16, offset, true);
+  ev.setUint16(20, 0, true);
+
+  return new Blob([...localParts, ...centralParts, eocd], {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  });
+}
+
+function escapeXml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function buildDocxBlob(plainText) {
+  const lines = plainText.replace(/\r\n/g, '\n').split('\n');
+  const paragraphs = lines.map(line => {
+    if (!line.trim()) return '<w:p/>';
+    return `<w:p><w:r><w:rPr><w:rFonts w:ascii="PingFang SC" w:eastAsia="微软雅黑" w:hAnsi="PingFang SC"/><w:sz w:val="21"/></w:rPr><w:t xml:space="preserve">${escapeXml(line)}</w:t></w:r></w:p>`;
+  }).join('');
+
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`;
+
+  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+  const docXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    ${paragraphs}
+    <w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr>
+  </w:body>
+</w:document>`;
+
+  return createStoredZip([
+    { name: '[Content_Types].xml', content: contentTypes },
+    { name: '_rels/.rels', content: rels },
+    { name: 'word/document.xml', content: docXml }
+  ]);
+}
+
+function exportFinalDocx(customText = null, customTitle = null) {
+  const txt = customText || state.currentScript.finalFullText || document.getElementById('finalScriptEditor').value;
+  if (!txt.trim()) return showToast('暂无可导出内容');
+  const blob = buildDocxBlob(txt);
+  const name = customTitle ? `${customTitle.replace(/[\\/:*?"<>|]/g, '')}.docx` : getExportFilename('docx');
+  downloadBlob(blob, name);
+  showToast('已本地打包导出 DOCX 文档');
+}
+
+/* =========================================================
+   十二、本地剧本库（时间轴卡片式管理）
+   ========================================================= */
+function saveCurrentToLibrary(silent = false) {
+  const s = state.currentScript;
+  if (!s.outline && !s.finalFullText) {
+    if (!silent) showToast('还没有生成内容可保存');
+    return;
+  }
+  const now = new Date();
+  const record = {
+    id: s.id || ('lib_' + Date.now()),
+    title: s.title || (s.global.world[0] ? s.global.world[0] + '剧本' : '未命名剧本'),
+    updatedAt: now.toISOString(),
+    world: [...(s.global.world || [])],
+    tone: [...(s.global.tone || [])],
+    charCount: s.characters.length,
+    hasFull: !!s.finalFullText,
+    snippet: (s.outline || s.finalFullText || '').slice(0, 88),
+    snapshot: JSON.parse(JSON.stringify(s))
+  };
+  s.id = record.id;
+
+  const idx = state.library.findIndex(x => x.id === record.id);
+  if (idx >= 0) state.library[idx] = record;
+  else state.library.unshift(record);
+
+  persistLibrary();
+  persistDraft();
+  if (!silent) showToast('已保存到本地剧本库');
+}
+
+function formatTimelineDate(iso) {
+  const d = new Date(iso);
+  const hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  const md = `${d.getMonth() + 1}月${d.getDate()}日`;
+  return { hm, md };
+}
+
+function renderLibrary() {
+  document.getElementById('libraryCountText').textContent = `共 ${state.library.length} 份本地剧本`;
+  const wrap = document.getElementById('libraryList');
+  if (!state.library.length) {
+    wrap.innerHTML = `<div class="empty-state"><div style="font-size:15px;font-weight:700;color:var(--ink);">本地剧本库还是空的</div><p>去随机抽一套标签，或者自定一个脑洞开始创作吧</p></div>`;
+    return;
+  }
+
+  wrap.innerHTML = state.library.map(item => {
+    const { hm, md } = formatTimelineDate(item.updatedAt);
+    const wBadge = item.world[0] ? `<span class="badge terra">${escapeHtml(item.world[0])}</span>` : '';
+    const tBadge = item.tone[0] ? `<span class="badge sage">${escapeHtml(item.tone[0])}</span>` : '';
+    const statusBadge = item.hasFull ? `<span class="badge dark">已成稿</span>` : `<span class="badge soft">大纲中</span>`;
+    return `
+      <div class="timeline-item">
+        <div class="timeline-time">
+          <div class="t-main">${hm}</div>
+          <div class="t-sub">${md}</div>
+        </div>
+        <div class="timeline-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div class="lib-title">${escapeHtml(item.title)}</div>
+            <span class="badge soft" style="flex-shrink:0;">${item.charCount}男主</span>
+          </div>
+          <div class="lib-sub">${escapeHtml(item.snippet)}</div>
+          <div class="lib-tags">${statusBadge}${wBadge}${tBadge}</div>
+          <div class="lib-footer">
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-primary btn-xs" onclick="loadFromLibrary('${item.id}')">编辑</button>
+              <button class="btn btn-soft btn-xs" onclick="copyLibraryItem('${item.id}')">复制</button>
+              <button class="btn btn-soft btn-xs" onclick="exportLibraryItem('${item.id}','docx')">DOCX</button>
+            </div>
+            <button class="btn btn-terra btn-xs" onclick="deleteLibraryItem('${item.id}')">删除</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function loadFromLibrary(id) {
+  const item = state.library.find(x => x.id === id);
+  if (!item) return;
+  state.currentScript = JSON.parse(JSON.stringify(item.snapshot));
+  state.studioStep = state.currentScript.finalFullText ? 2 : 1;
+  persistDraft();
+  switchPage('studio');
+  showToast('已载入该剧本');
+}
+
+function copyLibraryItem(id) {
+  const item = state.library.find(x => x.id === id);
+  if (!item) return;
+  const txt = item.snapshot.finalFullText || item.snapshot.outline || '';
+  copyTextSafe(txt);
+}
+
+function exportLibraryItem(id, type) {
+  const item = state.library.find(x => x.id === id);
+  if (!item) return;
+  const txt = item.snapshot.finalFullText || item.snapshot.outline || '';
+  if (type === 'docx') exportFinalDocx(txt, item.title);
+  else exportFinalTxt(txt, item.title);
+}
+
+function deleteLibraryItem(id) {
+  state.library = state.library.filter(x => x.id !== id);
+  persistLibrary();
+  renderLibrary();
+  showToast('已从剧本库删除');
+}
+
+/* =========================================================
+   十三、API 接口与固定模板设置页
+   ========================================================= */
+function renderSettings() {
+  document.getElementById('apiBaseUrl').value = state.settings.baseUrl || '';
+  document.getElementById('apiKey').value = state.settings.apiKey || '';
+  document.getElementById('apiTemp').value = state.settings.temperature;
+  document.getElementById('apiTopP').value = state.settings.topP;
+  document.getElementById('apiMaxTokens').value = state.settings.maxTokens;
+  document.getElementById('apiStream').checked = !!state.settings.stream;
+  updateParamDisplay(false);
+  renderModelSelect();
+
+  document.getElementById('tplHeaderInput').value = state.template.header;
+  document.getElementById('tplMidInput').value = state.template.middle;
+  document.getElementById('tplFooterInput').value = state.template.footer;
+}
+
+function renderModelSelect() {
+  const sel = document.getElementById('apiModelSelect');
+  const models = state.settings.models || [];
+  if (!models.length) {
+    sel.innerHTML = `<option value="${escapeHtml(state.settings.model || '')}">${escapeHtml(state.settings.model || '请点击下方自动获取模型')}</option>`;
+    return;
+  }
+  sel.innerHTML = models.map(m => `<option value="${escapeHtml(m)}" ${m === state.settings.model ? 'selected' : ''}>${escapeHtml(m)}</option>`).join('');
+}
+
+function onModelSelectChange(val) {
+  state.settings.model = val;
+  saveSettings();
+}
+
+function updateParamDisplay(doSave = true) {
+  const t = Number(document.getElementById('apiTemp').value);
+  const p = Number(document.getElementById('apiTopP').value);
+  const m = Number(document.getElementById('apiMaxTokens').value);
+  document.getElementById('tempVal').textContent = t.toFixed(2);
+  document.getElementById('topPVal').textContent = p.toFixed(2);
+  document.getElementById('maxTokVal').textContent = m;
+  if (doSave) saveSettings();
+}
+
+function saveSettings() {
+  state.settings.baseUrl = document.getElementById('apiBaseUrl').value.trim();
+  state.settings.apiKey = document.getElementById('apiKey').value.trim();
+  state.settings.temperature = Number(document.getElementById('apiTemp').value);
+  state.settings.topP = Number(document.getElementById('apiTopP').value);
+  state.settings.maxTokens = Number(document.getElementById('apiMaxTokens').value);
+  state.settings.stream = document.getElementById('apiStream').checked;
+  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+  updateTopbarStatus();
+}
+
+function toggleKeyVis() {
+  const input = document.getElementById('apiKey');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+async function fetchModels() {
+  saveSettings();
+  const baseUrl = getNormalizedBaseUrl();
+  if (!baseUrl || !state.settings.apiKey) {
+    showToast('请先填写 Base URL 和 Key');
+    return;
+  }
+  const btn = document.getElementById('fetchModelsBtn');
+  btn.disabled = true;
+  btn.textContent = '正在获取模型列表...';
+  try {
+    const resp = await fetch(`${baseUrl}/models`, {
+      headers: { 'Authorization': `Bearer ${state.settings.apiKey}` }
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const list = (data.data || []).map(x => x.id).filter(Boolean).sort();
+    if (!list.length) throw new Error('返回模型列表为空');
+    state.settings.models = list;
+    if (!list.includes(state.settings.model)) {
+      state.settings.model = list[0];
+    }
+    state.settings.connStatus = 'ok';
+    localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+    renderModelSelect();
+    updateTopbarStatus();
+    showToast(`成功获取 ${list.length} 个模型`);
+  } catch (err) {
+    state.settings.connStatus = 'err';
+    updateTopbarStatus();
+    showToast('获取模型失败：' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '自动获取模型';
+  }
+}
+
+async function testConnection() {
+  saveSettings();
+  if (!getNormalizedBaseUrl() || !state.settings.apiKey) {
+    showToast('请先填写接口地址和密钥');
+    return;
+  }
+  if (!state.settings.model) {
+    await fetchModels();
+    if (!state.settings.model) return;
+  }
+  const btn = document.getElementById('testConnBtn');
+  btn.disabled = true;
+  btn.textContent = '正在测试连接...';
+  try {
+    await callLLM([{ role: 'user', content: '请只回复两个字：正常' }], { maxTokens: 16, streamOverride: false });
+    state.settings.connStatus = 'ok';
+    localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+    updateTopbarStatus();
+    showToast('连接测试成功，模型响应正常');
+  } catch (err) {
+    state.settings.connStatus = 'err';
+    updateTopbarStatus();
+    showToast('连接失败：' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '测试连接';
+  }
+}
+
+function saveTemplateSettings(toast = false) {
+  state.template.header = document.getElementById('tplHeaderInput').value;
+  state.template.middle = document.getElementById('tplMidInput').value;
+  state.template.footer = document.getElementById('tplFooterInput').value;
+  localStorage.setItem(STORAGE_KEYS.template, JSON.stringify(state.template));
+  if (toast) showToast('固定规则模板已保存');
+}
+
+function resetTemplateDefaults() {
+  state.template = { ...DEFAULT_TEMPLATE };
+  localStorage.setItem(STORAGE_KEYS.template, JSON.stringify(state.template));
+  renderSettings();
+  showToast('已恢复小雨滴指令 2.0 默认全文');
+}
+
+/* =========================================================
+   十四、工具函数与启动初始化
+   ========================================================= */
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function escapeJs(str) {
+  return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+document.getElementById('chatInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMessage();
+  }
+});
+document.getElementById('customTagInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') confirmAddCustomTag();
+});
+
+loadAllStorage();
+updateTopbarStatus();
+renderHome();
+</script>
+</body>
+</html>
