@@ -6,1030 +6,201 @@
 <title>随机剧本生成库</title>
 <style>
   :root {
-    --bg: #E9E5DF;
-    --bg-desktop: #DCD7CF;
-    --surface: #FFFFFF;
-    --surface-soft: #F5F2ED;
-    --surface-glass: rgba(255, 255, 255, 0.72);
-    --ink: #18181B;
-    --ink-2: #57534E;
-    --ink-3: #8C857D;
-    --line: #E5E0D8;
-    --dashed: #C5BEB4;
-    --terra: #C67355;
-    --terra-bg: #F6E8E2;
-    --sage: #5E8068;
-    --sage-bg: #E6EFE8;
-    --amber: #B08142;
-    --amber-bg: #F5ECD9;
-    --radius-xl: 24px;
-    --radius-lg: 18px;
-    --radius-md: 14px;
-    --radius-pill: 9999px;
-    --shadow-sm: 0 2px 10px rgba(24, 24, 27, 0.04);
-    --shadow-md: 0 8px 26px rgba(24, 24, 27, 0.08);
-    --shadow-nav: 0 10px 32px rgba(24, 24, 27, 0.12);
+    --bg: #E9E5DF; --bg-desktop: #DCD7CF; --surface: #FFFFFF; --surface-soft: #F5F2ED;
+    --ink: #18181B; --ink-2: #57534E; --ink-3: #8C857D; --line: #E5E0D8; --dashed: #C5BEB4;
+    --terra: #C67355; --terra-bg: #F6E8E2; --sage: #5E8068; --sage-bg: #E6EFE8;
+    --radius-xl: 24px; --radius-lg: 18px; --radius-md: 14px; --radius-pill: 9999px;
+    --shadow-sm: 0 2px 10px rgba(24,24,27,0.04); --shadow-md: 0 8px 26px rgba(24,24,27,0.08);
+    --shadow-nav: 0 10px 32px rgba(24,24,27,0.12);
     --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   }
-
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg-desktop);
-    color: var(--ink);
-    font-family: var(--font);
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  .app-shell {
-    width: 100%;
-    max-width: 480px;
-    min-height: 100vh;
-    margin: 0 auto;
-    background: var(--bg);
-    position: relative;
-    padding-bottom: 104px;
-    box-shadow: 0 0 40px rgba(24, 24, 27, 0.08);
-  }
-
-  @media (min-width: 540px) {
-    body {
-      padding: 20px 0;
-    }
-    .app-shell {
-      min-height: calc(100vh - 40px);
-      border-radius: 36px;
-      overflow: hidden;
-    }
-  }
-
-  /* 顶部栏 */
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 20px 12px;
-    background: rgba(233, 229, 223, 0.88);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
-
-  .topbar-title {
-    font-size: 25px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: var(--ink);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 12px;
-    background: var(--surface);
-    border-radius: var(--radius-pill);
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--ink-2);
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    max-width: 155px;
-    border: none;
-  }
-
-  .status-pill span.model-label {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--ink-3);
-    flex-shrink: 0;
-  }
-  .status-dot.ok { background: var(--sage); }
-  .status-dot.err { background: var(--terra); }
-
-  .icon-circle-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--ink);
-    color: #FFF;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.15s ease, opacity 0.15s ease;
-    flex-shrink: 0;
-  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg-desktop); color: var(--ink); font-family: var(--font); font-size: 14px; line-height: 1.5; min-height: 100vh; overflow-x: hidden; }
+  .app-shell { width: 100%; max-width: 480px; min-height: 100vh; margin: 0 auto; background: var(--bg); position: relative; padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 0 40px rgba(24,24,27,0.08); }
+  @media (min-width: 540px) { body { padding: 20px 0; } .app-shell { min-height: calc(100vh - 40px); border-radius: 36px; overflow: hidden; } }
+  .topbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 12px; background: rgba(233,229,223,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .topbar-title { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--ink); }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; background: var(--surface); border-radius: var(--radius-pill); font-size: 12px; font-weight: 500; color: var(--ink-2); box-shadow: var(--shadow-sm); cursor: pointer; max-width: 155px; border: none; }
+  .status-pill span.model-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); flex-shrink: 0; }
+  .status-dot.ok { background: var(--sage); } .status-dot.err { background: var(--terra); }
+  .icon-circle-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--ink); color: #FFF; border: none; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.15s ease; flex-shrink: 0; }
   .icon-circle-btn:active { transform: scale(0.93); }
-  .icon-circle-btn.light {
-    background: var(--surface);
-    color: var(--ink);
-  }
-
-  /* 页面容器 */
-  .page {
-    display: none;
-    padding: 4px 18px 20px;
-    animation: fadeIn 0.22s ease;
-  }
+  .page { display: none; padding: 4px 18px 34px; animation: fadeIn 0.22s ease; }
   .page.active { display: block; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* 通用卡片 */
-  .card {
-    background: var(--surface);
-    border-radius: var(--radius-xl);
-    padding: 18px;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 12px;
-  }
-
-  .dashed-card {
-    border: 1.5px dashed var(--dashed);
-    background: rgba(255, 255, 255, 0.36);
-    border-radius: var(--radius-xl);
-    padding: 16px 18px;
-    color: var(--ink-2);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    margin-bottom: 12px;
-    transition: background 0.15s ease;
-  }
-  .dashed-card:active { background: rgba(255, 255, 255, 0.65); }
-
-  /* 首页入口卡片 */
-  .hero-entry {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .card { background: var(--surface); border-radius: var(--radius-xl); padding: 18px; box-shadow: var(--shadow-sm); margin-bottom: 12px; }
+  .dashed-card { border: 1.5px dashed var(--dashed); background: rgba(255,255,255,0.36); border-radius: var(--radius-xl); padding: 16px 18px; color: var(--ink-2); display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 12px; }
+  .dashed-card:active { background: rgba(255,255,255,0.65); }
+  .hero-entry { display: flex; align-items: center; gap: 14px; cursor: pointer; transition: transform 0.15s ease; }
   .hero-entry:active { transform: scale(0.985); }
-
-  .entry-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-    background: var(--surface-soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ink);
-    flex-shrink: 0;
-  }
-  .entry-icon.dark {
-    background: var(--ink);
-    color: #FFF;
-  }
-  .entry-icon.terra {
-    background: var(--terra-bg);
-    color: var(--terra);
-  }
-  .entry-icon.sage {
-    background: var(--sage-bg);
-    color: var(--sage);
-  }
-
+  .entry-icon { width: 48px; height: 48px; border-radius: 16px; background: var(--surface-soft); display: flex; align-items: center; justify-content: center; color: var(--ink); flex-shrink: 0; }
+  .entry-icon.dark { background: var(--ink); color: #FFF; } .entry-icon.terra { background: var(--terra-bg); color: var(--terra); } .entry-icon.sage { background: var(--sage-bg); color: var(--sage); }
   .entry-body { flex: 1; min-width: 0; }
-  .entry-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 3px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .entry-desc {
-    font-size: 12.5px;
-    color: var(--ink-3);
-    line-height: 1.4;
-  }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 9px;
-    border-radius: var(--radius-pill);
-    font-size: 11px;
-    font-weight: 600;
-  }
-  .badge.terra { background: var(--terra-bg); color: var(--terra); }
-  .badge.sage { background: var(--sage-bg); color: var(--sage); }
-  .badge.dark { background: var(--ink); color: #FFF; }
-  .badge.soft { background: var(--surface-soft); color: var(--ink-2); }
-  .badge.amber { background: var(--amber-bg); color: var(--amber); }
-
-  /* 按钮体系 */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    border: none;
-    border-radius: var(--radius-pill);
-    padding: 12px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    transition: transform 0.14s ease, opacity 0.14s ease, background 0.14s ease;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn:disabled { opacity: 0.45; pointer-events: none; }
-  .btn-primary { background: var(--ink); color: #FFF; }
-  .btn-white { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
-  .btn-soft { background: var(--surface-soft); color: var(--ink); }
-  .btn-terra { background: var(--terra-bg); color: var(--terra); }
-  .btn-sage { background: var(--sage-bg); color: var(--sage); }
-  .btn-sm { padding: 7px 13px; font-size: 12px; }
-  .btn-xs { padding: 5px 10px; font-size: 11.5px; }
-  .btn-block { width: 100%; }
-
-  /* 竖向分组切换胶囊（复刻参考图顶部日期条） */
-  .rail-scroll {
-    display: flex;
-    gap: 9px;
-    overflow-x: auto;
-    padding: 4px 2px 12px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
+  .entry-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 3px; display: flex; align-items: center; gap: 8px; }
+  .entry-desc { font-size: 12.5px; color: var(--ink-3); line-height: 1.4; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge.terra { background: var(--terra-bg); color: var(--terra); } .badge.sage { background: var(--sage-bg); color: var(--sage); }
+  .badge.dark { background: var(--ink); color: #FFF; } .badge.soft { background: var(--surface-soft); color: var(--ink-2); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: var(--radius-pill); padding: 12px 18px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; flex-shrink: 0; transition: transform 0.14s ease, opacity 0.14s ease; }
+  .btn:active { transform: scale(0.97); } .btn:disabled { opacity: 0.45; pointer-events: none; }
+  .btn-primary { background: var(--ink); color: #FFF; } .btn-white { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+  .btn-soft { background: var(--surface-soft); color: var(--ink); } .btn-terra { background: var(--terra-bg); color: var(--terra); } .btn-sage { background: var(--sage-bg); color: var(--sage); }
+  .btn-sm { padding: 8px 14px; font-size: 12.5px; } .btn-xs { padding: 6px 11px; font-size: 12px; } .btn-block { width: 100%; flex-shrink: 1; }
+  .rail-scroll { display: flex; gap: 9px; overflow-x: auto; padding: 4px 2px 12px; scrollbar-width: none; }
   .rail-scroll::-webkit-scrollbar { display: none; }
-
-  .rail-pill {
-    flex-shrink: 0;
-    min-width: 68px;
-    padding: 10px 12px;
-    border-radius: 26px;
-    background: var(--surface);
-    color: var(--ink);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    border: none;
-    font-family: inherit;
-    transition: all 0.18s ease;
-  }
-  .rail-pill .rail-sub {
-    font-size: 10.5px;
-    color: var(--ink-3);
-    font-weight: 500;
-  }
-  .rail-pill .rail-main {
-    font-size: 14px;
-    font-weight: 700;
-    max-width: 78px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .rail-pill .rail-count {
-    font-size: 10.5px;
-    color: var(--ink-3);
-  }
-  .rail-pill.active {
-    background: var(--ink);
-    color: #FFF;
-    box-shadow: var(--shadow-md);
-  }
-  .rail-pill.active .rail-sub,
-  .rail-pill.active .rail-count {
-    color: rgba(255, 255, 255, 0.72);
-  }
-  .rail-pill.add-pill {
-    background: rgba(255,255,255,0.42);
-    border: 1.5px dashed var(--dashed);
-    box-shadow: none;
-    color: var(--ink-2);
-    min-width: 58px;
-  }
-
-  /* 折叠标签分类卡片 */
-  .cat-card {
-    background: var(--surface);
-    border-radius: var(--radius-xl);
-    margin-bottom: 11px;
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-  }
-
-  .cat-head {
-    padding: 15px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .cat-head-left {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
-    flex: 1;
-  }
-
-  .cat-title-row {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-
-  .cat-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--ink);
-  }
-
-  .cat-preview {
-    font-size: 12px;
-    color: var(--ink-3);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  .rail-pill { flex-shrink: 0; min-width: 68px; padding: 10px 12px; border-radius: 26px; background: var(--surface); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; box-shadow: var(--shadow-sm); border: none; font-family: inherit; }
+  .rail-pill .rail-sub { font-size: 10.5px; color: var(--ink-3); font-weight: 500; }
+  .rail-pill .rail-main { font-size: 14px; font-weight: 700; max-width: 78px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rail-pill .rail-count { font-size: 10.5px; color: var(--ink-3); }
+  .rail-pill.active { background: var(--ink); color: #FFF; box-shadow: var(--shadow-md); }
+  .rail-pill.active .rail-sub, .rail-pill.active .rail-count { color: rgba(255,255,255,0.72); }
+  .rail-pill.add-pill { background: rgba(255,255,255,0.42); border: 1.5px dashed var(--dashed); box-shadow: none; color: var(--ink-2); min-width: 58px; }
+  .cat-card { background: var(--surface); border-radius: var(--radius-xl); margin-bottom: 11px; box-shadow: var(--shadow-sm); overflow: hidden; }
+  .cat-head { padding: 15px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; user-select: none; }
+  .cat-head-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+  .cat-title-row { display: flex; align-items: center; gap: 7px; }
+  .cat-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .cat-preview { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cat-preview.has-val { color: var(--terra); font-weight: 500; }
-
-  .cat-tools {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-
-  .mini-tool {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: none;
-    background: var(--surface-soft);
-    color: var(--ink-2);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .mini-tool:active { transform: scale(0.9); }
-  .mini-tool.locked {
-    background: var(--terra-bg);
-    color: var(--terra);
-  }
-
-  .cat-chevron {
-    color: var(--ink-3);
-    transition: transform 0.2s ease;
-    display: inline-flex;
-  }
+  .cat-tools { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .mini-tool { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--surface-soft); color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+  .mini-tool:active { transform: scale(0.9); } .mini-tool.locked { background: var(--terra-bg); color: var(--terra); }
+  .cat-chevron { color: var(--ink-3); transition: transform 0.2s ease; display: inline-flex; }
   .cat-card.open .cat-chevron { transform: rotate(180deg); }
-
-  .cat-body {
-    display: none;
-    padding: 0 16px 16px;
-    border-top: 1px solid var(--surface-soft);
-  }
+  .cat-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--surface-soft); }
   .cat-card.open .cat-body { display: block; padding-top: 12px; }
-
-  .sub-group-bar {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    scrollbar-width: none;
-  }
-  .sub-group-bar::-webkit-scrollbar { display: none; }
-
-  .sub-tab {
-    flex-shrink: 0;
-    padding: 5px 11px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-soft);
-    color: var(--ink-2);
-    font-size: 12px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .sub-tab.active {
-    background: var(--ink);
-    color: #FFF;
-  }
-  .sub-tab.match-hint {
-    background: var(--sage-bg);
-    color: var(--sage);
-  }
-  .sub-tab.active.match-hint {
-    background: var(--ink);
-    color: #FFF;
-  }
-
-  .group-label {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--ink-3);
-    margin: 10px 0 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .group-label:first-child { margin-top: 2px; }
-
-  .chip-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-  }
-
-  .chip {
-    padding: 7px 12px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-soft);
-    color: var(--ink-2);
-    font-size: 12.5px;
-    font-weight: 500;
-    border: 1px solid transparent;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.14s ease;
-    user-select: none;
-  }
-  .chip:active { transform: scale(0.95); }
-  .chip.selected {
-    background: var(--ink);
-    color: #FFF;
-  }
-  .chip.custom-chip {
-    border-style: dashed;
-    border-color: var(--dashed);
-    background: transparent;
-    color: var(--ink-2);
-  }
-  .chip.custom-tag-selected {
-    background: var(--terra);
-    color: #FFF;
-  }
-
-  /* 工坊顶部操作条 */
-  .workshop-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .char-meta-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  /* 表单控件 */
-  .input, .textarea, .select {
-    width: 100%;
-    border: 1px solid var(--line);
-    background: var(--surface-soft);
-    border-radius: var(--radius-md);
-    padding: 11px 13px;
-    font-size: 13.5px;
-    color: var(--ink);
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.15s ease, background 0.15s ease;
-  }
-  .input:focus, .textarea:focus, .select:focus {
-    border-color: var(--ink);
-    background: #FFF;
-  }
-  .textarea {
-    resize: vertical;
-    min-height: 96px;
-    line-height: 1.6;
-  }
-
-  /* 聊天页 */
-  .chat-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-height: calc(100vh - 280px);
-    padding-bottom: 14px;
-  }
-  .msg-row {
-    display: flex;
-    flex-direction: column;
-    max-width: 88%;
-  }
-  .msg-row.user {
-    align-self: flex-end;
-    align-items: flex-end;
-  }
-  .msg-row.ai {
-    align-self: flex-start;
-    align-items: flex-start;
-  }
-  .msg-bubble {
-    padding: 12px 15px;
-    border-radius: 20px;
-    font-size: 13.5px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .msg-row.user .msg-bubble {
-    background: var(--ink);
-    color: #FFF;
-    border-bottom-right-radius: 6px;
-  }
-  .msg-row.ai .msg-bubble {
-    background: var(--surface);
-    color: var(--ink);
-    border-bottom-left-radius: 6px;
-    box-shadow: var(--shadow-sm);
-  }
-  .chat-dock {
-    position: sticky;
-    bottom: 92px;
-    background: rgba(233, 229, 223, 0.94);
-    backdrop-filter: blur(12px);
-    padding: 10px 0 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .chat-input-row {
-    display: flex;
-    gap: 8px;
-    align-items: flex-end;
-    background: var(--surface);
-    padding: 7px 8px 7px 14px;
-    border-radius: 24px;
-    box-shadow: var(--shadow-sm);
-  }
-  .chat-input-row textarea {
-    flex: 1;
-    border: none;
-    background: transparent;
-    resize: none;
-    outline: none;
-    font-family: inherit;
-    font-size: 14px;
-    max-height: 96px;
-    padding: 6px 0;
-    line-height: 1.4;
-    color: var(--ink);
-  }
-
-  /* 生成与细拆页 */
-  .step-switch {
-    display: flex;
-    background: var(--surface);
-    padding: 5px;
-    border-radius: var(--radius-pill);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 14px;
-  }
-  .step-btn {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 9px 12px;
-    border-radius: var(--radius-pill);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink-2);
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.16s ease;
-  }
-  .step-btn.active {
-    background: var(--ink);
-    color: #FFF;
-  }
-
-  .script-editor {
-    width: 100%;
-    min-height: 320px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: 14px;
-    font-size: 13.5px;
-    line-height: 1.72;
-    color: var(--ink);
-    background: var(--surface-soft);
-    font-family: inherit;
-    outline: none;
-    resize: vertical;
-  }
-  .script-editor:focus {
-    background: #FFF;
-    border-color: var(--ink);
-  }
-
-  .export-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 12px;
-  }
-
-  /* 剧本库时间轴列表（复刻参考图） */
-  .timeline-item {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 14px;
-    align-items: flex-start;
-  }
-  .timeline-time {
-    width: 50px;
-    flex-shrink: 0;
-    padding-top: 12px;
-    text-align: left;
-  }
-  .timeline-time .t-main {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--ink);
-    line-height: 1.2;
-  }
-  .timeline-time .t-sub {
-    font-size: 11px;
-    color: var(--ink-3);
-    margin-top: 2px;
-  }
-  .timeline-card {
-    flex: 1;
-    min-width: 0;
-    background: var(--surface);
-    border-radius: var(--radius-xl);
-    padding: 15px 16px;
-    box-shadow: var(--shadow-sm);
-  }
-  .lib-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 4px;
-    word-break: break-word;
-  }
-  .lib-sub {
-    font-size: 12px;
-    color: var(--ink-3);
-    margin-bottom: 10px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .lib-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 11px;
-  }
-  .lib-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 10px;
-    border-top: 1px solid var(--surface-soft);
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  /* 设置页 */
-  .setting-group-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink-3);
-    margin: 14px 4px 8px;
-  }
-  .setting-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--surface-soft);
-  }
+  .seg-track { display: flex; gap: 4px; background: var(--surface-soft); padding: 4px; border-radius: var(--radius-pill); margin-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
+  .seg-track::-webkit-scrollbar { display: none; }
+  .seg-btn { flex: 1 0 auto; border: none; background: transparent; padding: 10px 14px; border-radius: var(--radius-pill); font-size: 13.5px; font-weight: 700; color: var(--ink-3); cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; transition: all 0.16s ease; }
+  .seg-btn.active { background: var(--ink); color: #FFF; box-shadow: var(--shadow-md); }
+  .seg-count { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--terra); color: #FFF; font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+  .seg-btn.active .seg-count { background: #FFF; color: var(--ink); }
+  .seg-rec { font-size: 10.5px; color: var(--sage); font-weight: 600; }
+  .seg-btn.active .seg-rec { color: rgba(255,255,255,0.75); }
+  .seg-desc { font-size: 11.5px; color: var(--ink-3); margin: 0 4px 10px; }
+  .group-label { font-size: 11.5px; font-weight: 600; color: var(--ink-3); margin: 10px 0 8px; }
+  .chip-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip { padding: 7px 12px; border-radius: var(--radius-pill); background: var(--surface-soft); color: var(--ink-2); font-size: 12.5px; font-weight: 500; border: 1px solid transparent; cursor: pointer; font-family: inherit; user-select: none; text-align: left; }
+  .chip:active { transform: scale(0.95); } .chip.selected { background: var(--ink); color: #FFF; }
+  .chip.custom-chip { border-style: dashed; border-color: var(--dashed); background: transparent; color: var(--ink-2); }
+  .chip.custom-tag-selected { background: var(--terra); color: #FFF; }
+  .workshop-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .char-meta-bar { display: flex; align-items: center; gap: 8px; }
+  .input, .textarea, .select { width: 100%; border: 1px solid var(--line); background: var(--surface-soft); border-radius: var(--radius-md); padding: 11px 13px; font-size: 13.5px; color: var(--ink); font-family: inherit; outline: none; }
+  .input:focus, .textarea:focus, .select:focus { border-color: var(--ink); background: #FFF; }
+  .textarea { resize: vertical; min-height: 96px; line-height: 1.6; }
+  .flow-steps { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: rgba(255,255,255,0.65); border-radius: var(--radius-lg); padding: 10px 14px; margin-bottom: 12px; font-size: 11.5px; color: var(--ink-2); font-weight: 600; }
+  .flow-step-dot { display: inline-flex; align-items: center; gap: 4px; }
+  .flow-step-num { width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: #FFF; font-size: 10.5px; display: inline-flex; align-items: center; justify-content: center; }
+  .prompt-history-item { padding: 11px 13px; border-radius: var(--radius-md); background: var(--surface-soft); margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .prompt-history-text { font-size: 13px; color: var(--ink); flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .step-switch { display: flex; background: var(--surface); padding: 5px; border-radius: var(--radius-pill); box-shadow: var(--shadow-sm); margin-bottom: 12px; }
+  .step-btn { flex: 1; border: none; background: transparent; padding: 9px 12px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; font-family: inherit; }
+  .step-btn.active { background: var(--ink); color: #FFF; }
+  .tag-summary-strip { background: rgba(255,255,255,0.72); border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 12px; font-size: 12px; color: var(--ink-2); }
+  .tag-strip-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; user-select: none; }
+  .tag-strip-summary { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tag-strip-toggle { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: var(--ink-2); font-weight: 600; flex-shrink: 0; }
+  .tag-summary-strip.open .tag-strip-toggle .cat-chevron { transform: rotate(180deg); }
+  .tag-strip-body { display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .tag-summary-strip.open .tag-strip-body { display: block; }
+  .tag-strip-group { margin-bottom: 11px; } .tag-strip-group:last-child { margin-bottom: 0; }
+  .tag-strip-group-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .tag-summary-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .script-editor { width: 100%; min-height: 300px; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 14px; font-size: 13.5px; line-height: 1.72; color: var(--ink); background: var(--surface-soft); font-family: inherit; outline: none; resize: vertical; }
+  .script-editor:focus { background: #FFF; border-color: var(--ink); }
+  .export-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .timeline-item { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+  .timeline-time { width: 50px; flex-shrink: 0; padding-top: 12px; }
+  .timeline-time .t-main { font-size: 13.5px; font-weight: 700; color: var(--ink); line-height: 1.2; }
+  .timeline-time .t-sub { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .timeline-card { flex: 1; min-width: 0; background: var(--surface); border-radius: var(--radius-xl); padding: 15px 16px; box-shadow: var(--shadow-sm); }
+  .lib-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; word-break: break-word; }
+  .lib-sub { font-size: 12px; color: var(--ink-3); margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .lib-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 11px; }
+  .lib-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--surface-soft); gap: 6px; flex-wrap: wrap; }
+  .setting-group-label { font-size: 12px; font-weight: 600; color: var(--ink-3); margin: 14px 4px 8px; }
+  .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--surface-soft); }
   .setting-row:last-child { border-bottom: none; }
-  .setting-row label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-    flex-shrink: 0;
-  }
-  .setting-inline-input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    text-align: right;
-    font-size: 13.5px;
-    color: var(--ink-2);
-    outline: none;
-    font-family: inherit;
-    min-width: 0;
-  }
-  .setting-inline-input:focus { color: var(--ink); }
-
-  .slider-block {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--surface-soft);
-  }
-  .slider-block:last-child { border-bottom: none; }
-  .slider-head {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-  }
+  .setting-row label { font-size: 14px; font-weight: 600; color: var(--ink); flex-shrink: 0; }
+  .setting-inline-input { flex: 1; border: none; background: transparent; text-align: right; font-size: 13.5px; color: var(--ink-2); outline: none; font-family: inherit; min-width: 0; }
+  .slider-block { padding: 10px 0; border-bottom: 1px solid var(--surface-soft); } .slider-block:last-child { border-bottom: none; }
+  .slider-head { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13.5px; font-weight: 600; }
   .slider-val { color: var(--ink-2); font-variant-numeric: tabular-nums; }
-  input[type="range"] {
-    width: 100%;
-    accent-color: var(--ink);
-    cursor: pointer;
-  }
-
-  /* 开关 */
-  .switch {
-    position: relative;
-    width: 46px;
-    height: 26px;
-    display: inline-block;
-  }
+  input[type="range"] { width: 100%; accent-color: var(--ink); cursor: pointer; }
+  .switch { position: relative; width: 46px; height: 26px; display: inline-block; }
   .switch input { opacity: 0; width: 0; height: 0; }
-  .switch-slider {
-    position: absolute;
-    inset: 0;
-    background: var(--line);
-    border-radius: var(--radius-pill);
-    transition: 0.2s;
-    cursor: pointer;
-  }
-  .switch-slider:before {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    left: 3px;
-    top: 3px;
-    background: #FFF;
-    border-radius: 50%;
-    transition: 0.2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
-  }
+  .switch-slider { position: absolute; inset: 0; background: var(--line); border-radius: var(--radius-pill); transition: 0.2s; cursor: pointer; }
+  .switch-slider:before { content: ""; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: #FFF; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
   .switch input:checked + .switch-slider { background: var(--ink); }
   .switch input:checked + .switch-slider:before { transform: translateX(20px); }
-
-  /* 悬浮底部导航栏 */
-  .bottom-nav-wrap {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 16px;
-    display: flex;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 50;
-    padding: 0 18px;
-  }
-
-  .bottom-nav {
-    pointer-events: auto;
-    width: 100%;
-    max-width: 420px;
-    background: var(--surface);
-    border-radius: var(--radius-pill);
-    padding: 7px 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: var(--shadow-nav);
-  }
-
-  .nav-item {
-    border: none;
-    background: transparent;
-    color: var(--ink-2);
-    border-radius: var(--radius-pill);
-    padding: 10px 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-  }
+  .bottom-nav-wrap { position: fixed; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: center; pointer-events: none; z-index: 50; padding: 0 18px; }
+  .bottom-nav { pointer-events: auto; width: 100%; max-width: 420px; background: var(--surface); border-radius: var(--radius-pill); padding: 7px 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-nav); }
+  .nav-item { border: none; background: transparent; color: var(--ink-2); border-radius: var(--radius-pill); padding: 10px 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; transition: all 0.2s ease; }
   .nav-item .nav-text { display: none; }
-  .nav-item.active {
-    background: var(--ink);
-    color: #FFF;
-    padding: 10px 18px;
-  }
+  .nav-item.active { background: var(--ink); color: #FFF; padding: 10px 18px; }
   .nav-item.active .nav-text { display: inline; }
-
-  /* 轻提示与弹窗 */
-  .toast {
-    position: fixed;
-    top: 22px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-16px);
-    background: var(--ink);
-    color: #FFF;
-    padding: 10px 18px;
-    border-radius: var(--radius-pill);
-    font-size: 13px;
-    font-weight: 500;
-    z-index: 120;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.22s ease;
-    box-shadow: var(--shadow-md);
-    max-width: 88vw;
-    text-align: center;
-  }
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  .modal-mask {
-    position: fixed;
-    inset: 0;
-    background: rgba(24, 24, 27, 0.42);
-    backdrop-filter: blur(4px);
-    z-index: 100;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
+  .toast { position: fixed; top: 22px; left: 50%; transform: translateX(-50%) translateY(-16px); background: var(--ink); color: #FFF; padding: 10px 18px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; z-index: 120; opacity: 0; pointer-events: none; transition: all 0.22s ease; box-shadow: var(--shadow-md); max-width: 88vw; text-align: center; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .modal-mask { position: fixed; inset: 0; background: rgba(24,24,27,0.42); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
   .modal-mask.show { display: flex; }
-  .modal-box {
-    width: 100%;
-    max-width: 380px;
-    background: var(--surface);
-    border-radius: var(--radius-xl);
-    padding: 20px;
-    box-shadow: var(--shadow-md);
-  }
-  .modal-title {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 14px;
-  }
-
-  .loading-bar {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12.5px;
-    color: var(--terra);
-    font-weight: 600;
-  }
-  .spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid var(--terra-bg);
-    border-top-color: var(--terra);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
+  .modal-box { width: 100%; max-width: 380px; background: var(--surface); border-radius: var(--radius-xl); padding: 20px; box-shadow: var(--shadow-md); }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+  .loading-bar { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--terra); font-weight: 600; }
+  .spinner { width: 14px; height: 14px; border: 2px solid var(--terra-bg); border-top-color: var(--terra); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .empty-state {
-    text-align: center;
-    padding: 48px 20px;
-    color: var(--ink-3);
-  }
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--ink-3); }
   .empty-state p { margin: 10px 0 0; font-size: 13px; }
-
-  .hint-note {
-    font-size: 12px;
-    color: var(--ink-3);
-    padding: 2px 6px 8px;
-    line-height: 1.5;
-  }
-
-  .search-input-wrap {
-    margin-bottom: 10px;
-  }
+  .hint-note { font-size: 12px; color: var(--ink-3); padding: 2px 6px 8px; line-height: 1.5; }
 </style>
 </head>
 <body>
 <div class="app-shell">
-  <!-- 顶部栏 -->
   <header class="topbar">
-    <div class="topbar-title" id="topbarTitle">剧本库</div>
+    <div class="topbar-title" id="topbarTitle">剧本生成库</div>
     <div class="topbar-actions">
-      <button class="status-pill" id="topModelBtn" onclick="switchPage('settings')">
+      <button class="status-pill" onclick="switchPage('settings')">
         <span class="status-dot" id="topStatusDot"></span>
         <span class="model-label" id="topModelText">配置接口</span>
       </button>
-      <button class="icon-circle-btn" id="topQuickBtn" title="新建随机剧本" onclick="startRandomWorkshop()">
+      <button class="icon-circle-btn" title="新建随机剧本" onclick="startRandomWorkshop()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/></svg>
       </button>
     </div>
   </header>
 
-  <!-- 1. 首页 -->
   <main id="page-home" class="page active">
     <div class="card hero-entry" onclick="startRandomWorkshop()">
-      <div class="entry-icon dark">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>
-      </div>
+      <div class="entry-icon dark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg></div>
       <div class="entry-body">
         <div class="entry-title">随机剧本 <span class="badge terra">程序直抽</span></div>
-        <div class="entry-desc">程序按世界观智能抽取完整标签，支持锁定满意项与无限重摇，确认后再生成故事</div>
+        <div class="entry-desc">程序按世界观抽取完整标签，可锁定满意项无限重摇，确认后再生成故事</div>
       </div>
     </div>
-
     <div class="card hero-entry" onclick="startCustomWorkshop()">
-      <div class="entry-icon sage">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-      </div>
+      <div class="entry-icon sage"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
       <div class="entry-body">
         <div class="entry-title">自定剧本 <span class="badge sage">十二大类</span></div>
-        <div class="entry-desc">像填调查问卷一样挑选全局设定与多角色独立标签，支持手打冷门词条</div>
+        <div class="entry-desc">只选你想指定的标签，其余留空由模型补全，支持多角色与自定义词条</div>
       </div>
     </div>
-
     <div class="card hero-entry" onclick="switchPage('chat')">
-      <div class="entry-icon terra">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
+      <div class="entry-icon terra"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
       <div class="entry-body">
-        <div class="entry-title">聊天剧本 <span class="badge soft">脑洞提取</span></div>
-        <div class="entry-desc">随口聊出模糊脑洞，一键自动勾选匹配标签并带入确认页，灵感零丢失</div>
+        <div class="entry-title">一句话剧本 <span class="badge soft">直出标签</span></div>
+        <div class="entry-desc">说一句想法和避雷，直接打好全套标签并跳转工坊确认</div>
       </div>
     </div>
-
-    <div class="dashed-card" id="resumeDraftCard" onclick="switchPage('workshop')">
+    <div class="dashed-card" onclick="switchPage('workshop')">
       <div>
         <div style="font-weight:700;color:var(--ink);font-size:14px;">继续当前工坊草稿</div>
         <div style="font-size:12px;color:var(--ink-3);margin-top:2px;" id="draftSummaryText">尚未选择标签，点击直接进入标签工坊</div>
       </div>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
-
     <div class="card" style="padding:15px 16px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <span style="font-size:13.5px;font-weight:700;">最近保存的剧本</span>
@@ -1039,111 +210,96 @@
     </div>
   </main>
 
-  <!-- 2. 聊天脑洞页 -->
   <main id="page-chat" class="page">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <button class="btn btn-white btn-xs" onclick="switchPage('home')">返回首页</button>
-      <button class="btn btn-soft btn-xs" onclick="clearChatHistory()">清空对话</button>
+      <div id="directTagLoading" class="loading-bar" style="display:none;"><span class="spinner"></span><span>正在按需求打标签...</span></div>
     </div>
-    <div class="chat-wrap" id="chatMessages"></div>
-    <div class="chat-dock">
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-primary btn-sm" style="flex:1;" id="extractTagsBtn" onclick="extractTagsFromChat()">
-          一键提取标签到工坊
-        </button>
+    <div class="flow-steps">
+      <span class="flow-step-dot"><span class="flow-step-num">1</span>写需求</span><span>→</span>
+      <span class="flow-step-dot"><span class="flow-step-num">2</span>直跳标签页</span><span>→</span>
+      <span class="flow-step-dot"><span class="flow-step-num">3</span>确认补充</span><span>→</span>
+      <span class="flow-step-dot"><span class="flow-step-num">4</span>生成剧本</span>
+    </div>
+    <div class="card">
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px;">说说你想玩什么样的剧本</div>
+      <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px;">写下世界观参考、男主人数、想要的拉扯感和避雷点。提交后不陪聊，直接打好标签跳到工坊。</div>
+      <textarea class="textarea" id="directPromptInput" style="min-height:130px;" placeholder="例如：我要玩类似道诡异仙的修仙世界观剧本，不要阴婚，两个男主修罗场，一个表面温和实则疯批，一个冷淡但护短"></textarea>
+      <div style="margin-top:12px;margin-bottom:14px;">
+        <div style="font-size:11.5px;color:var(--ink-3);font-weight:600;margin-bottom:7px;">点一下试试示例灵感</div>
+        <div class="chip-wrap">
+          <button class="chip" onclick="fillDirectExample('我要玩类似道诡异仙的修仙世界观剧本，不要阴婚，氛围诡异细思极恐')">类似道诡异仙修仙·不要阴婚</button>
+          <button class="chip" onclick="fillDirectExample('现代都市双男主修罗场，前任与现任狭路相逢，成年人极限拉扯，拒绝狗血车祸失忆')">都市双男主前任现任修罗场</button>
+          <button class="chip" onclick="fillDirectExample('民国十里洋场悬疑风，单男主笑面虎督军，互相利用暗流涌动，女主清醒不好惹')">民国笑面虎·互相利用</button>
+          <button class="chip" onclick="fillDirectExample('规则怪谈无限流副本，男主是副本里看起来无害的阴湿男鬼，微恐带点病态拉扯')">规则怪谈·阴湿男鬼</button>
+        </div>
       </div>
-      <div class="chat-input-row">
-        <textarea id="chatInput" rows="1" placeholder="说说你的脑洞，比如：修仙修罗场，两个男主互相看不顺眼，微虐..."></textarea>
-        <button class="icon-circle-btn" id="sendChatBtn" onclick="sendChatMessage()" style="width:36px;height:36px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
+      <button class="btn btn-primary btn-block" id="directGenerateBtn" onclick="generateTagsDirectly()">一键打全套标签，直接进工坊</button>
+    </div>
+    <div class="card" id="promptHistoryCard" style="display:none;padding:15px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:13.5px;font-weight:700;">最近提过的需求</span>
+        <button class="btn btn-soft btn-xs" onclick="clearPromptHistory()">清空</button>
       </div>
+      <div id="promptHistoryList"></div>
     </div>
   </main>
 
-  <!-- 3. 标签确认工坊 -->
   <main id="page-workshop" class="page">
-    <!-- 顶部横滑分组胶囊 -->
     <div class="rail-scroll" id="workshopRail"></div>
-
-    <!-- 快捷控制条 -->
     <div class="workshop-bar">
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn-white btn-xs" onclick="randomizeAllUnlocked()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>
-          重摇未锁定
-        </button>
+        <button class="btn btn-white btn-xs" onclick="randomizeAllUnlocked()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>重摇未锁定</button>
         <button class="btn btn-soft btn-xs" onclick="toggleExpandAll()">展开/收起</button>
         <button class="btn btn-soft btn-xs" onclick="clearCurrentTab()">清空本页</button>
       </div>
       <span class="badge soft" id="totalTagCountBadge">已选 0 项</span>
     </div>
-
-    <!-- 角色专属信息头 -->
     <div id="charMetaSection" style="display:none;">
       <div class="card" style="padding:13px 15px;margin-bottom:11px;">
-        <div class="char-meta-bar" style="margin-bottom:0;">
+        <div class="char-meta-bar">
           <input type="text" class="input" id="charNameInput" placeholder="给这个角色起个代号或备注名" oninput="updateCurrentCharName(this.value)" style="padding:9px 12px;">
-          <button class="btn btn-soft btn-sm" onclick="randomizeSingleCharacter()" title="重摇该角色未锁项">摇本角色</button>
+          <button class="btn btn-soft btn-sm" onclick="randomizeSingleCharacter()">摇本角色</button>
           <button class="btn btn-terra btn-sm" id="deleteCharBtn" onclick="deleteCurrentCharacter()">删除</button>
         </div>
       </div>
     </div>
-
-    <!-- 分类卡片挂载点 -->
     <div id="workshopCategories"></div>
-
-    <!-- 额外脑洞补充（全局页显示） -->
     <div class="card" id="extraNoteCard" style="padding:15px 16px;">
       <div style="font-size:14px;font-weight:700;margin-bottom:8px;">额外脑洞与避雷补充</div>
-      <textarea class="textarea" id="extraNotesInput" placeholder="可补充标签库里没有的细节、角色间特殊渊源、或者你不想要的元素（选填）" oninput="updateExtraNotes(this.value)"></textarea>
+      <textarea class="textarea" id="extraNotesInput" placeholder="可补充标签库里没有的细节、角色间特殊渊源、或者你不想要的元素（例如：类似道诡异仙氛围、不要阴婚）" oninput="updateExtraNotes(this.value)"></textarea>
     </div>
-
-    <!-- 底部确认生成栏 -->
     <div style="display:flex;gap:8px;margin-top:6px;">
-      <button class="btn btn-primary btn-block" onclick="goGenerateOutline()">
-        确认标签，生成故事大纲
-      </button>
+      <button class="btn btn-primary btn-block" onclick="goGenerateOutline()">确认标签，生成故事大纲</button>
     </div>
   </main>
 
-  <!-- 4. 大纲与细拆生成页 -->
   <main id="page-studio" class="page">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <button class="btn btn-white btn-xs" onclick="switchPage('workshop')">返回改标签</button>
-      <div id="studioLoading" class="loading-bar" style="display:none;">
-        <span class="spinner"></span><span id="studioLoadingText">生成中...</span>
-      </div>
+      <div id="studioLoading" class="loading-bar" style="display:none;"><span class="spinner"></span><span id="studioLoadingText">生成中...</span></div>
     </div>
-
     <div class="step-switch">
       <button class="step-btn active" id="stepBtn1" onclick="switchStudioStep(1)">第一步 故事大纲</button>
       <button class="step-btn" id="stepBtn2" onclick="switchStudioStep(2)">第二步 完整剧本</button>
     </div>
-
-    <!-- 步骤一：大纲 -->
+    <div class="tag-summary-strip" id="studioTagStrip"></div>
     <div id="studioStep1">
       <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <input type="text" class="input" id="scriptTitleInput" placeholder="剧本标题（生成后可自定修改）" oninput="state.currentScript.title=this.value;persistDraft();" style="font-weight:700;padding:8px 12px;margin-right:8px;">
-          <button class="btn btn-soft btn-xs" onclick="generateOutline(false)">重写</button>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <input type="text" class="input" id="scriptTitleInput" placeholder="剧本标题（生成后可自定修改）" oninput="state.currentScript.title=this.value;persistDraft();" style="font-weight:700;padding:8px 12px;flex:1;min-width:0;">
+          <button class="btn btn-soft btn-sm" onclick="generateOutline(false)">重写</button>
         </div>
-        <textarea class="script-editor" id="outlineEditor" placeholder="点击下方按钮或等待大纲生成。这里只构建世界观切入、人物张力和开局起手式，绝不剧透大结局..." oninput="state.currentScript.outline=this.value;persistDraft();"></textarea>
-
+        <textarea class="script-editor" id="outlineEditor" placeholder="点击重写或等待大纲生成。这里只构建世界观切入、人物张力和开局起手式，不写大结局..." oninput="state.currentScript.outline=this.value;persistDraft();"></textarea>
         <div style="display:flex;gap:8px;margin-top:10px;">
-          <input type="text" class="input" id="outlineReviseInput" placeholder="输入微调意见，比如：把开场改得更剑拔弩张一点">
-          <button class="btn btn-soft btn-sm" style="flex-shrink:0;" onclick="generateOutline(true)">微调</button>
+          <input type="text" class="input" id="outlineReviseInput" placeholder="输入微调意见，比如：把开场改得更剑拔弩张一点" style="flex:1;min-width:0;">
+          <button class="btn btn-soft btn-sm" onclick="generateOutline(true)">微调</button>
         </div>
       </div>
-
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-primary btn-block" id="startDetailBtn" onclick="generateFullDetails()">
-          确认大纲，开始细拆设定
-        </button>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="btn btn-primary btn-block" id="startDetailBtn" onclick="generateFullDetails()">确认大纲，开始细拆设定</button>
       </div>
     </div>
-
-    <!-- 步骤二：细拆与完整拼装 -->
     <div id="studioStep2" style="display:none;">
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;">
@@ -1153,8 +309,7 @@
             <button class="btn btn-sage btn-xs" onclick="saveCurrentToLibrary()">存入剧本库</button>
           </div>
         </div>
-        <textarea class="script-editor" id="finalScriptEditor" style="min-height:380px;" placeholder="等待细拆内容生成，系统会自动拼装顶部防出戏规则、排版要求和底部启动指令..." oninput="onFinalEditorInput(this.value)"></textarea>
-
+        <textarea class="script-editor" id="finalScriptEditor" style="min-height:380px;" placeholder="等待细拆内容生成，系统会自动拼装顶部规则、排版要求和底部启动指令..." oninput="onFinalEditorInput(this.value)"></textarea>
         <div class="export-grid">
           <button class="btn btn-primary btn-sm" onclick="copyFinalScript()">一键复制</button>
           <button class="btn btn-soft btn-sm" onclick="exportFinalTxt()">导出 TXT</button>
@@ -1164,7 +319,6 @@
     </div>
   </main>
 
-  <!-- 5. 本地剧本库 -->
   <main id="page-library" class="page">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <span style="font-size:13px;color:var(--ink-2);font-weight:600;" id="libraryCountText">共 0 份本地剧本</span>
@@ -1173,70 +327,63 @@
     <div id="libraryList"></div>
   </main>
 
-  <!-- 6. 接口与模板设置页 -->
   <main id="page-settings" class="page">
     <div class="setting-group-label">接口</div>
     <div class="card" style="padding:4px 16px;">
+      <div class="setting-row"><label>Base URL</label><input class="setting-inline-input" id="apiBaseUrl" placeholder="https://api.openai.com/v1" onchange="saveSettings()"></div>
       <div class="setting-row">
-        <label>Base URL</label>
-        <input class="setting-inline-input" id="apiBaseUrl" placeholder="https://api.openai.com/v1" onchange="saveSettings()">
-      </div>
-      <div class="setting-row">
-        <label>Key</label>
-        <input class="setting-inline-input" type="password" id="apiKey" placeholder="输入你的 API Key" onchange="saveSettings()">
-        <button class="mini-tool" onclick="toggleKeyVis()" title="显示或隐藏密钥" style="width:26px;height:26px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
+        <label>Key</label><input class="setting-inline-input" type="password" id="apiKey" placeholder="输入你的 API Key" onchange="saveSettings()">
+        <button class="mini-tool" onclick="toggleKeyVis()" style="width:26px;height:26px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
       </div>
     </div>
     <div class="hint-note">Key 只存在你浏览器的本地存储里，不会上传到任何第三方服务器。</div>
 
     <div class="setting-group-label">模型</div>
     <div class="card" style="padding:12px 16px;">
-      <div class="setting-row" style="padding-top:2px;">
-        <label>当前模型</label>
-        <select class="select" id="apiModelSelect" onchange="onModelSelectChange(this.value)" style="width:auto;max-width:65%;padding:7px 10px;text-align:right;"></select>
-      </div>
-      <div style="margin-top:10px;">
-        <button class="btn btn-soft btn-block" id="fetchModelsBtn" onclick="fetchModels()">自动获取模型</button>
-      </div>
+      <div class="setting-row" style="padding-top:2px;"><label>当前模型</label><select class="select" id="apiModelSelect" onchange="onModelSelectChange(this.value)" style="width:auto;max-width:65%;padding:7px 10px;"></select></div>
+      <div style="margin-top:10px;"><button class="btn btn-soft btn-block" id="fetchModelsBtn" onclick="fetchModels()">自动获取模型</button></div>
     </div>
 
     <div class="setting-group-label">参数</div>
     <div class="card" style="padding:6px 16px;">
+      <div class="slider-block"><div class="slider-head"><span>Temperature</span><span class="slider-val" id="tempVal">0.75</span></div><input type="range" id="apiTemp" min="0" max="2" step="0.05" value="0.75" oninput="updateParamDisplay()"></div>
+      <div class="slider-block"><div class="slider-head"><span>Top P</span><span class="slider-val" id="topPVal">0.90</span></div><input type="range" id="apiTopP" min="0.05" max="1" step="0.05" value="0.90" oninput="updateParamDisplay()"></div>
       <div class="slider-block">
-        <div class="slider-head"><span>Temperature</span><span class="slider-val" id="tempVal">0.75</span></div>
-        <input type="range" id="apiTemp" min="0" max="2" step="0.05" value="0.75" oninput="updateParamDisplay()">
+        <div class="slider-head"><span>最大回复长度</span><span class="slider-val" id="maxTokVal">8192</span></div>
+        <input type="range" id="apiMaxTokens" min="1024" max="32000" step="256" value="8192" oninput="updateParamDisplay()">
+        <div style="font-size:11.5px;color:var(--ink-3);margin-top:6px;">多男主剧本建议 8000 以上，被截断时会自动续写</div>
       </div>
-      <div class="slider-block">
-        <div class="slider-head"><span>Top P</span><span class="slider-val" id="topPVal">0.90</span></div>
-        <input type="range" id="apiTopP" min="0.05" max="1" step="0.05" value="0.90" oninput="updateParamDisplay()">
-      </div>
-      <div class="slider-block">
-        <div class="slider-head"><span>最大回复长度</span><span class="slider-val" id="maxTokVal">4096</span></div>
-        <input type="range" id="apiMaxTokens" min="800" max="8192" step="128" value="4096" oninput="updateParamDisplay()">
-      </div>
-      <div class="setting-row">
-        <label>流式输出</label>
-        <label class="switch">
-          <input type="checkbox" id="apiStream" checked onchange="saveSettings()">
-          <span class="switch-slider"></span>
-        </label>
-      </div>
+      <div class="setting-row"><label>流式输出</label><label class="switch"><input type="checkbox" id="apiStream" checked onchange="saveSettings()"><span class="switch-slider"></span></label></div>
     </div>
 
     <button class="btn btn-primary btn-block" id="testConnBtn" onclick="testConnection()" style="margin-bottom:14px;">测试连接</button>
+
+    <div class="setting-group-label">剧本文笔限制指令</div>
+    <div class="cat-card open" id="stylePromptCard">
+      <div class="cat-head" onclick="document.getElementById('stylePromptCard').classList.toggle('open')">
+        <div class="cat-head-left">
+          <div class="cat-title">自定义文笔与行文限制</div>
+          <div class="cat-preview" id="stylePromptPreview">未填写，点击粘贴你的文笔限制指令</div>
+        </div>
+        <span class="cat-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cat-body">
+        <textarea class="textarea" id="stylePromptInput" style="min-height:150px;" placeholder="把你的文笔要求、禁用词清单、白描规则或喜欢的文风范例粘贴到这里。每次生成大纲和细拆剧本时，会自动带给模型严格执行。" oninput="saveStylePrompt(false)"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn btn-primary btn-sm" style="flex:1;" onclick="saveStylePrompt(true)">保存文笔指令</button>
+          <button class="btn btn-soft btn-sm" onclick="clearStylePrompt()">清空</button>
+        </div>
+      </div>
+    </div>
 
     <div class="setting-group-label">固定规则模板管理（小雨滴指令 2.0）</div>
     <div class="cat-card" id="templateCard">
       <div class="cat-head" onclick="document.getElementById('templateCard').classList.toggle('open')">
         <div class="cat-head-left">
           <div class="cat-title">编辑顶部规则 / 排版要求 / 启动指令</div>
-          <div class="cat-preview">已内置小雨滴指令2.0全文，支持在线升级或一键恢复默认</div>
+          <div class="cat-preview">已内置小雨滴指令2.0全文，支持在线修改或一键恢复默认</div>
         </div>
-        <span class="cat-chevron">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </span>
+        <span class="cat-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
       </div>
       <div class="cat-body">
         <div class="group-label">顶部固定规则（位于角色设定之前）</div>
@@ -1253,33 +400,19 @@
     </div>
   </main>
 
-  <!-- 悬浮底部导航 -->
   <div class="bottom-nav-wrap">
     <nav class="bottom-nav">
-      <button class="nav-item active" data-page="home" onclick="switchPage('home')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
-        <span class="nav-text">首页</span>
-      </button>
-      <button class="nav-item" data-page="workshop" onclick="switchPage('workshop')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>
-        <span class="nav-text">工坊</span>
-      </button>
-      <button class="nav-item" data-page="library" onclick="switchPage('library')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span class="nav-text">剧本库</span>
-      </button>
-      <button class="nav-item" data-page="settings" onclick="switchPage('settings')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
-        <span class="nav-text">设置</span>
-      </button>
+      <button class="nav-item active" data-page="home" onclick="switchPage('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span class="nav-text">首页</span></button>
+      <button class="nav-item" data-page="workshop" onclick="switchPage('workshop')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg><span class="nav-text">工坊</span></button>
+      <button class="nav-item" data-page="library" onclick="switchPage('library')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span class="nav-text">剧本库</span></button>
+      <button class="nav-item" data-page="settings" onclick="switchPage('settings')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg><span class="nav-text">设置</span></button>
     </nav>
   </div>
 </div>
 
-<!-- 自定义标签弹窗 -->
 <div class="modal-mask" id="customTagModal">
   <div class="modal-box">
-    <div class="modal-title" id="customTagModalTitle">添加自定义标签</div>
+    <div class="modal-title">添加自定义标签</div>
     <input type="text" class="input" id="customTagInput" placeholder="输入自定义词条，多个可用逗号隔开">
     <div class="modal-actions">
       <button class="btn btn-soft btn-sm" onclick="closeCustomTagModal()">取消</button>
@@ -1287,14 +420,9 @@
     </div>
   </div>
 </div>
-
-<!-- 轻提示 -->
 <div class="toast" id="toast"></div>
 
 <script>
-/* =========================================================
-   一、内置小雨滴指令 2.0 固定文案模板（严格保留原文）
-   ========================================================= */
 const DEFAULT_TEMPLATE = {
   header: `启动角色扮演模式，请严格遵守以下全部规则。
 
@@ -1350,11 +478,9 @@ const DEFAULT_TEMPLATE = {
 2、小插曲必须快闭环。临时引入的日常事件只用来催化互动、展现角色另一面或转换气氛，严禁无限滚雪球升级。只要完成了当下的互动作用，就在几轮对话内自然收尾翻篇，绝不喧宾夺主或拖泥带水。
 3、关系确认后的防腻味与张力升级。双方关系稳定或确认恋情后，严禁陷入在同一室内反复亲昵、空洞说情话的死循环。此时互动的重心应自然转向真实相处的烟火气与深度磨合，包括生活习惯的微小差异、工作压力带来的情绪起伏、共同探索新地点、处理社交人情或彼此照料等，让感情在具体生活里持续流动。
 4、角色主动抛钩子与自然转场。角色不能被动等待用户推动所有剧情，应结合自身的生活轨迹，适时主动带来外界的新鲜见闻、随口聊起遇到的麻烦事，或者主动提议出门、换场景、安排接下来的日常活动。当同一场景内的互动已经充分、节奏开始停滞时，角色会自然提起下一个日程来推动场景切换，但只提出建议和引子，绝不替用户做最终决定。`,
-
   middle: `文字输出排版要求
 1、时间戳格式。每次回复的第一行固定写为：时间 空格 天气 空格 地点。时间随对话长短自然流逝，天气与地点随剧情动态更新。时间戳下方必须空一行再写正文。
 2、小说化排版与人称。全程使用第三人称描写角色，采用传统纸质小说的纯文本排版。人物说出的台词时上下空一行。动作描写与台词自然融合，按情绪停顿和焦点转移合理分段，保持阅读的流畅感与呼吸感。`,
-
   footer: `启动指令
 收到以上设定后的首次回复，只输出下面这七行内容等待用户填写，切勿额外添加任何其他文字：
 请填写信息，我们马上开始
@@ -1368,436 +494,198 @@ const DEFAULT_TEMPLATE = {
 待用户填写并发送上述信息后，你的下一轮回复立即严格按照文字输出排版要求，从开场剧情正式开始演绎。`
 };
 
-/* =========================================================
-   二、完整十二大类 + 开场切入情境标签库
-   ========================================================= */
 const GLOBAL_CATEGORIES = [
-  {
-    key: 'countMode',
-    title: '男主数量模式',
-    multi: false,
-    hint: '单选，选双男主或三男主会自动增减角色卡片',
-    tags: [
-      '单男主纯爱','双男主修罗场','红白玫瑰双男主','兄弟双男主','死对头双男主',
-      '前任与现任','师徒或长辈晚辈','三男主买股','多男主万人迷','切片精分多马甲',
-      '隐藏真男主','阶段性单线','无固定自由触发','随机数量'
-    ]
-  },
-  {
-    key: 'world',
-    title: '世界与时代',
-    multi: true,
-    hint: '选定后会自动联动角色身份里的对应职业库',
-    groups: [
-      { id: 'modern', name: '现代现实', tags: ['现代都市','豪门世家','财阀政治','职场商战','律政医疗','体制内','娱乐圈','校园青春','贵族学院','电竞直播','科研艺术','地下黑市','黑帮极道','雇佣兵谍战','悬疑刑侦','暴风雪山庄','公路孤岛求生'] },
-      { id: 'republic', name: '民国年代', tags: ['民国旧事','军阀混战','十里洋场','民国奇幻捉鬼','五六十年代','七八十年代','九十年代港风','胡同大院','乡镇烟火','千禧年复古'] },
-      { id: 'ancient', name: '古风仙侠', tags: ['架空古代','宫廷权谋','科举朝堂','市井种田','武侠江湖','修仙玄幻','仙侠虐恋','山海志怪','民俗诡异','中式恐怖','道士捉鬼','盗墓风水','现代修仙','妖管局灵异局','赛博修仙'] },
-      { id: 'western', name: '西幻欧风', tags: ['西幻魔法','中世纪骑士','奇幻学院','维多利亚蒸汽朋克','哥特暗黑','血族猎人','天使恶魔','诸神黄昏','人鱼深海','暗黑童话','大航海时代','西部牛仔','美式复古'] },
-      { id: 'scifi', name: '科幻星际', tags: ['赛博朋克','近未来仿生人','人工智能觉醒','全息网游元宇宙','星际帝国','机甲虫族','太空歌剧','星际荒野','高维文明'] },
-      { id: 'apocalypse', name: '末世异能', tags: ['丧尸围城','天灾囤货','极寒极热末世','核污染废土','畸变末世','末日列车方舟','灵气复苏','都市异能','信息素世界观','哨兵向导','黑塔白塔','异常收容所','克苏鲁邪神'] },
-      { id: 'infinite', name: '无限脑洞', tags: ['无限流副本','逃生游戏','规则怪谈','中式梦核后室','诡异直播间','快穿系统','穿书觉醒','弹幕剧透','全员读心','时间循环','平行时空','位面交易','动物兽世'] }
-    ]
-  },
-  {
-    key: 'tone',
-    title: '故事基调',
-    multi: true,
-    hint: '控制整体氛围和文风走向',
-    tags: [
-      '轻松日常','市井烟火气','治愈温馨','沙雕搞笑','欢喜轻喜剧','甜宠撒糖','慢热细水长流','唯美浪漫','文艺电影感','港风迷离',
-      '复古怀旧','潮湿闷热','留白诗意','宿命感','破碎感','救赎治愈','微虐带感','甜虐交织','先甜后虐','先虐后甜',
-      '悲剧美学','致郁压抑','暗黑黑深残','病娇阴湿','危险迷人','悬疑烧脑','惊悚恐怖','中式诡异','细思极恐','荒诞黑色幽默',
-      '权谋算计','暗流涌动','写实残酷','热血燃向','爽文逆袭','江湖侠气','宏大史诗','末世荒凉','赛博孤独','反套路解构'
-    ]
-  },
-  {
-    key: 'userRole',
-    title: '用户身份定位',
-    multi: true,
-    hint: '用于生成用户的故事背景',
-    tags: [
-      '普通打工人社畜','脆皮大学生','咸鱼摆烂党','自由职业者','负债求生者','寄人篱下借住者','普通小市民','落魄千金','家道中落者','真千金或假千金',
-      '豪门边缘联姻工具','隐形富豪收租大佬','行业新星精英','顶级天才学者','势均力敌的强者','扮猪吃虎隐藏大佬','人间清醒','顶级钓系海王','反套路乐子人','冷静旁观者',
-      '带刺不好惹的刺头','嘴强毒舌杠精','纯情钝感小白兔','直球选手','娇气作精','笨蛋美人','社恐小透明','缺爱小可怜','病弱美人美强惨','白切黑黑莲花',
-      '疯批野心家','精致利己主义者','藏着大秘密的人','卧底间谍','关键目击证人','共犯在逃人员','复仇者','失忆者','替身','白月光本人',
-      '前任初恋','逃婚退婚者','逃跑金丝雀','救命恩人','欠债人或债主','雇主甲方','宿敌死对头','破局变数','穿书重生者','系统攻略者',
-      '反攻略者','恶毒女配炮灰','觉醒纸片人','预知或读心能力者','无限流新人或大佬','灵异通灵体质','末世囤货大佬','异能或珍稀向导','伪装普通人的强者','人外混血',
-      '神明转世祭品','被盯上的猎物','反客为主的猎人'
-    ]
-  },
-  {
-    key: 'conflict',
-    title: '核心冲突与张力',
-    multi: true,
-    hint: '驱动开局矛盾与拉扯感',
-    tags: [
-      '立场阵营对立','家族世仇','阶级门第悬殊','价值观碰撞','利益权力博弈','同行商战暗算','互握把柄互相利用','塑料盟友随时反水','掉马暴露危机','双面卧底敌我难分',
-      '信任背叛危机','信息差与误会','被迫同舟共济','你逃我追反客为主','掌控与反抗','占有欲与自由冲突','理智克制与道德越界','禁忌背德伦理','地下恋曝光危机','谁先动心谁就输',
-      '自尊心拉扯','利益与真心抉择','契约到期危机','替身与白月光真相','破镜重圆的旧裂痕','追妻火葬场不被信任','多方争夺修罗场','救赎与自毁对抗','原生家庭与外界阻挠','被迫联姻逃婚',
-      '失忆与记忆篡改','真假身份之谜','凶案嫌疑密室猜忌','生死存亡倒计时','物种隔阂与寿命论','信息素或精神暴走','契约诅咒反噬','反抗宿命与世界规则','系统任务与真心背离','副本逃生信任考验',
-      '异化污染实验逃亡','时间循环时空错位','酒后或一夜越界后的尴尬','暗中窥伺与反侦察','宿敌被迫同居','危难中相依为命','生活习惯激烈磨合'
-    ]
-  },
-  {
-    key: 'opening',
-    title: '开场切入情境（选填）',
-    multi: true,
-    hint: '给故事定一个极有画面感的起手式',
-    tags: [
-      '雨夜被迫共处一室','意外撞破对方的秘密','酒后越界的次日清晨','工作或谈判桌上的正面交锋','一场突如其来的意外事故','久别重逢的尴尬瞬间','一方生病落魄时的照料','日常琐事引发的小争执',
-      '密闭空间被困待救','联姻或契约签约现场','危机四伏的逃亡途中','深夜独自买醉时的偶遇','陌生环境里的初次试探','一场各怀鬼胎的交易','对方主动找上门算账','被卷入异常事件的第一现场'
-    ]
-  }
+  { key: 'countMode', title: '男主数量模式', multi: false, hint: '单选，不选则按角色卡片数量决定', tags: ['单男主纯爱','双男主修罗场','红白玫瑰双男主','兄弟双男主','死对头双男主','前任与现任','师徒或长辈晚辈','三男主买股','多男主万人迷','切片精分多马甲','隐藏真男主','阶段性单线','无固定自由触发','随机数量'] },
+  { key: 'world', title: '世界与时代', multi: true, hint: '选定后会联动角色身份里的对应职业库（可不选）', groups: [
+    { id: 'modern', name: '现代现实', tags: ['现代都市','豪门世家','财阀政治','职场商战','律政医疗','体制内','娱乐圈','校园青春','贵族学院','电竞直播','科研艺术','地下黑市','黑帮极道','雇佣兵谍战','悬疑刑侦','暴风雪山庄','公路孤岛求生'] },
+    { id: 'republic', name: '民国年代', tags: ['民国旧事','军阀混战','十里洋场','民国奇幻捉鬼','五六十年代','七八十年代','九十年代港风','胡同大院','乡镇烟火','千禧年复古'] },
+    { id: 'ancient', name: '古风仙侠', tags: ['架空古代','宫廷权谋','科举朝堂','市井种田','武侠江湖','修仙玄幻','仙侠虐恋','山海志怪','民俗诡异','中式恐怖','道士捉鬼','盗墓风水','现代修仙','妖管局灵异局','赛博修仙'] },
+    { id: 'western', name: '西幻欧风', tags: ['西幻魔法','中世纪骑士','奇幻学院','维多利亚蒸汽朋克','哥特暗黑','血族猎人','天使恶魔','诸神黄昏','人鱼深海','暗黑童话','大航海时代','西部牛仔','美式复古'] },
+    { id: 'scifi', name: '科幻星际', tags: ['赛博朋克','近未来仿生人','人工智能觉醒','全息网游元宇宙','星际帝国','机甲虫族','太空歌剧','星际荒野','高维文明'] },
+    { id: 'apocalypse', name: '末世异能', tags: ['丧尸围城','天灾囤货','极寒极热末世','核污染废土','畸变末世','末日列车方舟','灵气复苏','都市异能','信息素世界观','哨兵向导','黑塔白塔','异常收容所','克苏鲁邪神'] },
+    { id: 'infinite', name: '无限脑洞', tags: ['无限流副本','逃生游戏','规则怪谈','中式梦核后室','诡异直播间','快穿系统','穿书觉醒','弹幕剧透','全员读心','时间循环','平行时空','位面交易','动物兽世'] }
+  ]},
+  { key: 'tone', title: '故事基调', multi: true, hint: '控制整体氛围和文风走向（可不选）', tags: ['轻松日常','市井烟火气','治愈温馨','沙雕搞笑','欢喜轻喜剧','甜宠撒糖','慢热细水长流','唯美浪漫','文艺电影感','港风迷离','复古怀旧','潮湿闷热','留白诗意','宿命感','破碎感','救赎治愈','微虐带感','甜虐交织','先甜后虐','先虐后甜','悲剧美学','致郁压抑','暗黑黑深残','病娇阴湿','危险迷人','悬疑烧脑','惊悚恐怖','中式诡异','细思极恐','荒诞黑色幽默','权谋算计','暗流涌动','写实残酷','热血燃向','爽文逆袭','江湖侠气','宏大史诗','末世荒凉','赛博孤独','反套路解构'] },
+  { key: 'userRole', title: '用户身份定位', multi: true, hint: '用于生成用户的故事背景（可不选）', tags: ['普通打工人社畜','脆皮大学生','咸鱼摆烂党','自由职业者','负债求生者','寄人篱下借住者','普通小市民','落魄千金','家道中落者','真千金或假千金','豪门边缘联姻工具','隐形富豪收租大佬','行业新星精英','顶级天才学者','势均力敌的强者','扮猪吃虎隐藏大佬','人间清醒','顶级钓系海王','反套路乐子人','冷静旁观者','带刺不好惹的刺头','嘴强毒舌杠精','纯情钝感小白兔','直球选手','娇气作精','笨蛋美人','社恐小透明','缺爱小可怜','病弱美人美强惨','白切黑黑莲花','疯批野心家','精致利己主义者','藏着大秘密的人','卧底间谍','关键目击证人','共犯在逃人员','复仇者','失忆者','替身','白月光本人','前任初恋','逃婚退婚者','逃跑金丝雀','救命恩人','欠债人或债主','雇主甲方','宿敌死对头','破局变数','穿书重生者','系统攻略者','反攻略者','恶毒女配炮灰','觉醒纸片人','预知或读心能力者','无限流新人或大佬','灵异通灵体质','末世囤货大佬','异能或珍稀向导','伪装普通人的强者','人外混血','神明转世祭品','被盯上的猎物','反客为主的猎人'] },
+  { key: 'conflict', title: '核心冲突与张力', multi: true, hint: '驱动开局矛盾与拉扯感（可不选）', tags: ['立场阵营对立','家族世仇','阶级门第悬殊','价值观碰撞','利益权力博弈','同行商战暗算','互握把柄互相利用','塑料盟友随时反水','掉马暴露危机','双面卧底敌我难分','信任背叛危机','信息差与误会','被迫同舟共济','你逃我追反客为主','掌控与反抗','占有欲与自由冲突','理智克制与道德越界','禁忌背德伦理','地下恋曝光危机','谁先动心谁就输','自尊心拉扯','利益与真心抉择','契约到期危机','替身与白月光真相','破镜重圆的旧裂痕','追妻火葬场不被信任','多方争夺修罗场','救赎与自毁对抗','原生家庭与外界阻挠','被迫联姻逃婚','失忆与记忆篡改','真假身份之谜','凶案嫌疑密室猜忌','生死存亡倒计时','物种隔阂与寿命论','信息素或精神暴走','契约诅咒反噬','反抗宿命与世界规则','系统任务与真心背离','副本逃生信任考验','异化污染实验逃亡','时间循环时空错位','酒后或一夜越界后的尴尬','暗中窥伺与反侦察','宿敌被迫同居','危难中相依为命','生活习惯激烈磨合'] },
+  { key: 'opening', title: '开场切入情境（选填）', multi: true, hint: '给故事定一个有画面感的起手式（可不选）', tags: ['雨夜被迫共处一室','意外撞破对方的秘密','酒后越界的次日清晨','工作或谈判桌上的正面交锋','一场突如其来的意外事故','久别重逢的尴尬瞬间','一方生病落魄时的照料','日常琐事引发的小争执','密闭空间被困待救','联姻或契约签约现场','危机四伏的逃亡途中','深夜独自买醉时的偶遇','陌生环境里的初次试探','一场各怀鬼胎的交易','对方主动找上门算账','被卷入异常事件的第一现场'] }
 ];
 
 const CHAR_CATEGORIES = [
-  {
-    key: 'species',
-    title: '物种与生理类型',
-    multi: true,
-    hint: '决定角色基础生理设定',
-    tags: [
-      '人类男性','男阿尔法','男贝塔','男欧米伽','兽人雄性','虫族雄虫',
-      '妖鬼精怪','人外神明','血族狼人','仿生人','觉醒人工智能','非人怪物'
-    ]
-  },
-  {
-    key: 'vibe',
-    title: '男主外在气质',
-    multi: true,
-    hint: '对应外貌与神态',
-    tags: [
-      '清冷疏离','高岭之花','禁欲克制','斯文败类','西装暴徒','优雅绅士','儒雅书卷气','端方君子','体制内老干部','老钱贵气',
-      '权贵上位者','智性恋天菜','温和人夫','爹系沉稳','哥系可靠','叔系成熟','浪荡纨绔','痞帅不羁','港风痞气','糙汉荷尔蒙',
-      '野性狼系','清爽少年感','阳光犬系','忠犬气质','懒散猫系','狡黠狐系','钓系美人','笑面虎','阴湿男鬼','病弱破碎',
-      '美强惨','颓废厌世','疯批美人','邪肆妖孽','冷峻锋利','散漫松弛','闷骚克制','毒舌傲娇','绿茶钓系','烟火气十足',
-      '仙风道骨','赛博冷感','看起来不好惹','看起来温和无害'
-    ]
-  },
-  {
-    key: 'personality',
-    title: '性格反差与缺点',
-    multi: true,
-    hint: '反差感与真实毛病是活人感核心',
-    groups: [
-      { id: 'contrast', name: '性格反差', tags: ['外冷内热','外热内冷','嘴硬心软','白切黑','黑切白','笑里藏刀','表面温和实则薄情','表面乖巧实则阴暗','表面斯文实则败类','表面禁欲实则偏执','表面高冷实则纯情','表面散漫实则步步为营','表面玩世不恭实则深情','表面冷淡实则护短','表面佛系实则野心勃勃','表面强势实则缺爱','表面冷静实则易碎','表面优雅实则颓废','表面社恐实则内心戏多','表面毒舌实则兜底','表面精明实则恋爱脑','表面无害实则危险','表面克制实则越界沉沦','表面高傲实则卑微'] },
-      { id: 'flaw', name: '真实缺点', tags: ['回避型依恋','焦虑型依恋','占有欲过强','控制欲极强','嫉妒爱吃飞醋','敏感多疑','缺乏安全感','极度拧巴','口是心非','嘴笨不会哄人','习惯性冷暴力','爱翻旧账记仇','爱试探底线','边界感过强','极度双标','死要面子','傲慢好胜','爱说教爹味重','自我中心','固执钻牛角尖','完美主义洁癖','娇气少爷脾气','精致利己','凉薄缺共情','习惯性隐瞒撒谎','睚眦必报','漠视规则','抠门市侩','暴躁易怒','阴郁厌世','自毁倾向','过度压抑情绪','恶趣味毒舌','重度工作狂','习惯独自扛事','过度内耗','戒备心极强','逃避现实拖延','冲动不计后果','生活白痴','起床气严重','酒品极差','极其挑食','路痴脸盲'] }
-    ]
-  },
-  {
-    key: 'identity',
-    title: '身份与处境',
-    multi: true,
-    linkedToWorld: true,
-    hint: '已根据全局世界观优先置顶对应时代职业',
-    groups: [
-      { id: 'modern', name: '现代常见职业', tags: ['豪门继承人','落魄贵公子','职场高管','投行金融精英','打工人社畜','金牌律师','法医刑警','外科医生','心理医生','高校教授','科研大佬','建筑设计师','艺术家音乐人','古董修复师','米其林主厨','咖啡店或酒吧老板','纹身师','赛车手','机长','消防员','退役特种兵','私人保镖','职业电竞选手','顶流明星','大导演','金牌经纪人','私家侦探','顶尖黑客','黑帮大佬','职业杀手','地下黑市老板','风水师道士','入殓师','大学生学霸','校霸','自由职业者'] },
-      { id: 'republic', name: '民国年代身份', tags: ['军阀少帅','督军','留洋博士','商会会长','报社记者','特务头子','戏班名角','战地医生','帮派老大','地下情报员'] },
-      { id: 'ancient', name: '古风仙侠身份', tags: ['帝王暴君','废太子','摄政王','权臣首辅','锦衣卫督主','少年将军','病弱世子','敌国质子','状元郎','落魄书生','神医毒医','仵作','江湖侠客','魔教教主','正道魁首','第一剑客','杀手阁主','暗卫死士','山贼头子','修仙宗主','高冷师尊','大师兄','魔尊妖皇','鬼王龙君','堕仙','陨落神明','地府判官','驱魔天师'] },
-      { id: 'western', name: '西幻欧风身份', tags: ['帝国皇储','公爵贵族','帝国元帅','圣骑士黑骑士','大魔法师','炼金术士','教皇','堕落天使','恶魔魔王','血族亲王','吸血鬼猎人','狼人首领','深海人鱼','龙族精灵','亡灵法师','吟游诗人','海盗船长'] },
-      { id: 'scifi', name: '科幻末世与无限流', tags: ['星际元帅','星际海盗','机甲驾驶员','联邦指挥官','机械师','赛博改造人','义体医生','疯狂科学家','逃亡实验体','异能局局长','特遣队长','收容所研究员','异常收容物','高级哨兵','顶级向导','末世基地首领','拾荒者','无限流大佬','副本首领','游戏管理员','克系邪神','邪神信徒','时间管理局特工','位面商人'] },
-      { id: 'situation', name: '通用处境补充', tags: ['上位掌权者','幕后操盘手','顶层权贵','体制内精英','普通中产','社会底层挣扎','落魄失势','家道中落','豪门私生子','草根逆袭','寄人篱下','灰色地带','法外狂徒','在逃通缉','阶下囚质子','隐姓埋名大佬','扮猪吃虎','双重身份'] }
-    ]
-  },
-  {
-    key: 'speech',
-    title: '说话风格',
-    multi: true,
-    hint: '对应说话习惯与台词范例',
-    tags: [
-      '惜字如金冷淡','慢条斯理慵懒','散漫松弛','温柔低声轻哄','循循善诱引导','礼貌疏离客气','礼貌带刺挖苦','温润斯文书卷气','古风雅致文绉绉','江湖豪爽粗犷',
-      '接地气烟火大白话','京味或港风方言感','体制内精英腔','逻辑严密专业控','居高临下命令感','毒舌刻薄嘴硬','阴阳怪气反问','痞气油嘴滑舌','钓系语带双关','茶言茶语装乖',
-      '撒娇黏腻直球','实诚笨拙易卡壳','社恐小声','笑眯眯放狠话','敬语藏刀','阴湿低语','疯批跳跃','冷静残忍无波澜','暴躁易怒爱打断','敷衍已读乱回',
-      '玩梗抽象冷笑话','爱起外号喊小朋友','爱留白停顿','欧风贵族腔','机械非人语感','神明俯视口吻','口嫌体正直','一针见血','嘴碎爱操心'
-    ]
-  },
-  {
-    key: 'innerCore',
-    title: '内在精神内核',
-    multi: true,
-    hint: '藏在冰山底下的暗线想法',
-    tags: [
-      '万物皆可等价交换','极度现实权衡利弊','不相信任何真心','靠谁不如靠自己','权力才是唯一安全感','厌恶一切失控','拒绝成为棋子','输不起的野心家','看淡生死随时离场','局外人冷眼旁观',
-      '拒绝产生情感羁绊','认为自己不配被爱','怕失去所以先推开','把温柔当保护色','知世故而不世故','守住底线极重承诺','有恩必还有仇必报','清高傲骨宁折不弯','泥潭里野蛮生长','习惯独自咽下委屈',
-      '及时行乐自由至上','天生反骨热衷破局','混乱中立乐子人','认准一人就是执念','以毁灭和痛苦确认存在','背负负罪感与赎罪','习惯替所有人兜底','差不多得了平凡即幸福','内核极稳通透豁达','看破不说破装糊涂',
-      '谁也不欠谁','非人冷漠观察人类','对世人薄情唯独对你心软','永远给自己留退路'
-    ]
-  },
-  {
-    key: 'relation',
-    title: '双方初始关系',
-    multi: true,
-    hint: '决定开局的绑定方式',
-    tags: [
-      '陌生偶遇','合租室友','对门邻居','房东与租客','青梅竹马','同窗同学','学长学妹','导师或家教与学生','上下级','总裁与秘书',
-      '甲乙方合作','职场竞争对手','商业联姻','先婚后爱','契约假扮情侣','隐婚或塑料夫妻','离婚冷静期','相亲对象','网恋奔现','游戏饭酒搭子',
-      '医生与患者','律师与委托人','心理师与来访者','明星与助理经纪人','黑粉或狗仔与明星','金主与金丝雀','保镖与雇主','债主与欠债人','常客与店主调酒师','借住寄人篱下',
-      '哥哥的朋友','闺蜜的弟弟','前任的死对头或小叔','前任重逢','白月光与替身','初恋久别重逢','双向暗恋未挑明','友情变质','地下恋情','一夜情后重逢',
-      '退婚逃婚替嫁','死对头欢喜冤家','宿敌天敌','塑料盟友共犯','互握把柄互相利用','猎人与猎物','警察与线人或嫌疑人','侦探与委托人','卧底与老大','刺客与目标',
-      '绑匪与人质','看守与阶下囚','敌国质子与皇室','正道与魔头','猎人与非人血族','研究员与实验体','收容员与收容物','伪骨科无血缘兄妹','收养资助与监护','师徒同门',
-      '主仆暗卫','饲主与人外','神明与信徒祭品','恶魔与契约者','创造者与仿生人','玩家与副本首领','穿书者与反派','哨兵与向导','救命恩人','捡到的失忆大佬',
-      '灵魂互换契约绑定','前世今生转世','末世或副本临时队友','现实死对头网上好搭子','被困同一空间的陌生人'
-    ]
-  },
-  {
-    key: 'loveStyle',
-    title: '感情观与相处模式',
-    multi: true,
-    hint: '对应感情观与相处模式栏目',
-    tags: [
-      '纯爱唯一','日久生情','一见钟情','见色起意','蓄谋已久','双向奔赴','势均力敌','引导型恋人','爹系纵容','伴侣式战友',
-      '灵魂智性共鸣','饭搭子烟火气','互怼日常','相爱相杀','成年人极限拉扯','克制又越界','高位者低头','神明跌落神坛','掌控与臣服','训狗博弈',
-      '互相折磨爱恨交织','双向救赎互为软肋','各自独立边界清晰','黏人挂件','极度双标护短','行动派冷脸兜底','嘴硬心软宠溺','沉默暗中守护','隐秘窥伺暗恋','卑微甘愿做替身',
-      '死缠烂打直球','有嘴不误会','嘴甜撒娇绿茶争宠','阴阳怪气吃醋','偏执独占病态依恋','先走肾后走心','假戏真做','权衡利弊后依然选你','浪子回头','戒断反应',
-      '人前不熟人后亲密','只谈风月不谈未来','事业优先顺便爱你','理性分析感性沦陷','吵架绝不隔夜','冷战比谁先低头','明争暗抢雄竞'
-    ]
-  }
+  { key: 'species', title: '物种与生理类型', multi: true, hint: '不选则由模型结合世界观自动决定', tags: ['人类男性','男阿尔法','男贝塔','男欧米伽','兽人雄性','虫族雄虫','妖鬼精怪','人外神明','血族狼人','仿生人','觉醒人工智能','非人怪物'] },
+  { key: 'vibe', title: '男主外在气质', multi: true, hint: '对应外貌与神态（可不选）', tags: ['清冷疏离','高岭之花','禁欲克制','斯文败类','西装暴徒','优雅绅士','儒雅书卷气','端方君子','体制内老干部','老钱贵气','权贵上位者','智性恋天菜','温和人夫','爹系沉稳','哥系可靠','叔系成熟','浪荡纨绔','痞帅不羁','港风痞气','糙汉荷尔蒙','野性狼系','清爽少年感','阳光犬系','忠犬气质','懒散猫系','狡黠狐系','钓系美人','笑面虎','阴湿男鬼','病弱破碎','美强惨','颓废厌世','疯批美人','邪肆妖孽','冷峻锋利','散漫松弛','闷骚克制','毒舌傲娇','绿茶钓系','烟火气十足','仙风道骨','赛博冷感','看起来不好惹','看起来温和无害'] },
+  { key: 'personality', title: '性格反差与缺点', multi: true, previewByGroup: true, hint: '反差感与真实毛病是活人感核心（可不选）', groups: [
+    { id: 'contrast', name: '性格反差', desc: '表面和内里不一样的地方，建议选 1 个', tags: ['外冷内热','外热内冷','嘴硬心软','白切黑','黑切白','笑里藏刀','表面温和实则薄情','表面乖巧实则阴暗','表面斯文实则败类','表面禁欲实则偏执','表面高冷实则纯情','表面散漫实则步步为营','表面玩世不恭实则深情','表面冷淡实则护短','表面佛系实则野心勃勃','表面强势实则缺爱','表面冷静实则易碎','表面优雅实则颓废','表面社恐实则内心戏多','表面毒舌实则兜底','表面精明实则恋爱脑','表面无害实则危险','表面克制实则越界沉沦','表面高傲实则卑微'] },
+    { id: 'flaw', name: '真实缺点', desc: '让他像活人的真实毛病，建议选 1 到 2 个', tags: ['回避型依恋','焦虑型依恋','占有欲过强','控制欲极强','嫉妒爱吃飞醋','敏感多疑','缺乏安全感','极度拧巴','口是心非','嘴笨不会哄人','习惯性冷暴力','爱翻旧账记仇','爱试探底线','边界感过强','极度双标','死要面子','傲慢好胜','爱说教爹味重','自我中心','固执钻牛角尖','完美主义洁癖','娇气少爷脾气','精致利己','凉薄缺共情','习惯性隐瞒撒谎','睚眦必报','漠视规则','抠门市侩','暴躁易怒','阴郁厌世','自毁倾向','过度压抑情绪','恶趣味毒舌','重度工作狂','习惯独自扛事','过度内耗','戒备心极强','逃避现实拖延','冲动不计后果','生活白痴','起床气严重','酒品极差','极其挑食','路痴脸盲'] }
+  ]},
+  { key: 'identity', title: '身份与处境', multi: true, linkedToWorld: true, previewByGroup: true, hint: '已根据全局世界观优先置顶对应时代职业（可不选）', groups: [
+    { id: 'modern', name: '现代职业', tags: ['豪门继承人','落魄贵公子','职场高管','投行金融精英','打工人社畜','金牌律师','法医刑警','外科医生','心理医生','高校教授','科研大佬','建筑设计师','艺术家音乐人','古董修复师','米其林主厨','咖啡店或酒吧老板','纹身师','赛车手','机长','消防员','退役特种兵','私人保镖','职业电竞选手','顶流明星','大导演','金牌经纪人','私家侦探','顶尖黑客','黑帮大佬','职业杀手','地下黑市老板','风水师道士','入殓师','大学生学霸','校霸','自由职业者'] },
+    { id: 'republic', name: '民国年代', tags: ['军阀少帅','督军','留洋博士','商会会长','报社记者','特务头子','戏班名角','战地医生','帮派老大','地下情报员'] },
+    { id: 'ancient', name: '古风仙侠', tags: ['帝王暴君','废太子','摄政王','权臣首辅','锦衣卫督主','少年将军','病弱世子','敌国质子','状元郎','落魄书生','神医毒医','仵作','江湖侠客','魔教教主','正道魁首','第一剑客','杀手阁主','暗卫死士','山贼头子','修仙宗主','高冷师尊','大师兄','魔尊妖皇','鬼王龙君','堕仙','陨落神明','地府判官','驱魔天师'] },
+    { id: 'western', name: '西幻欧风', tags: ['帝国皇储','公爵贵族','帝国元帅','圣骑士黑骑士','大魔法师','炼金术士','教皇','堕落天使','恶魔魔王','血族亲王','吸血鬼猎人','狼人首领','深海人鱼','龙族精灵','亡灵法师','吟游诗人','海盗船长'] },
+    { id: 'scifi', name: '科幻末世', tags: ['星际元帅','星际海盗','机甲驾驶员','联邦指挥官','机械师','赛博改造人','义体医生','疯狂科学家','逃亡实验体','异能局局长','特遣队长','收容所研究员','异常收容物','高级哨兵','顶级向导','末世基地首领','拾荒者','无限流大佬','副本首领','游戏管理员','克系邪神','邪神信徒','时间管理局特工','位面商人'] },
+    { id: 'situation', name: '通用处境', tags: ['上位掌权者','幕后操盘手','顶层权贵','体制内精英','普通中产','社会底层挣扎','落魄失势','家道中落','豪门私生子','草根逆袭','寄人篱下','灰色地带','法外狂徒','在逃通缉','阶下囚质子','隐姓埋名大佬','扮猪吃虎','双重身份'] }
+  ]},
+  { key: 'speech', title: '说话风格', multi: true, hint: '对应说话习惯与台词范例（可不选）', tags: ['惜字如金冷淡','慢条斯理慵懒','散漫松弛','温柔低声轻哄','循循善诱引导','礼貌疏离客气','礼貌带刺挖苦','温润斯文书卷气','古风雅致文绉绉','江湖豪爽粗犷','接地气烟火大白话','京味或港风方言感','体制内精英腔','逻辑严密专业控','居高临下命令感','毒舌刻薄嘴硬','阴阳怪气反问','痞气油嘴滑舌','钓系语带双关','茶言茶语装乖','撒娇黏腻直球','实诚笨拙易卡壳','社恐小声','笑眯眯放狠话','敬语藏刀','阴湿低语','疯批跳跃','冷静残忍无波澜','暴躁易怒爱打断','敷衍已读乱回','玩梗抽象冷笑话','爱起外号喊小朋友','爱留白停顿','欧风贵族腔','机械非人语感','神明俯视口吻','口嫌体正直','一针见血','嘴碎爱操心'] },
+  { key: 'innerCore', title: '内在精神内核', multi: true, hint: '藏在冰山底下的暗线想法（可不选）', tags: ['万物皆可等价交换','极度现实权衡利弊','不相信任何真心','靠谁不如靠自己','权力才是唯一安全感','厌恶一切失控','拒绝成为棋子','输不起的野心家','看淡生死随时离场','局外人冷眼旁观','拒绝产生情感羁绊','认为自己不配被爱','怕失去所以先推开','把温柔当保护色','知世故而不世故','守住底线极重承诺','有恩必还有仇必报','清高傲骨宁折不弯','泥潭里野蛮生长','习惯独自咽下委屈','及时行乐自由至上','天生反骨热衷破局','混乱中立乐子人','认准一人就是执念','以毁灭和痛苦确认存在','背负负罪感与赎罪','习惯替所有人兜底','差不多得了平凡即幸福','内核极稳通透豁达','看破不说破装糊涂','谁也不欠谁','非人冷漠观察人类','对世人薄情唯独对你心软','永远给自己留退路'] },
+  { key: 'relation', title: '双方初始关系', multi: true, hint: '决定开局的绑定方式（可不选）', tags: ['陌生偶遇','合租室友','对门邻居','房东与租客','青梅竹马','同窗同学','学长学妹','导师或家教与学生','上下级','总裁与秘书','甲乙方合作','职场竞争对手','商业联姻','先婚后爱','契约假扮情侣','隐婚或塑料夫妻','离婚冷静期','相亲对象','网恋奔现','游戏饭酒搭子','医生与患者','律师与委托人','心理师与来访者','明星与助理经纪人','黑粉或狗仔与明星','金主与金丝雀','保镖与雇主','债主与欠债人','常客与店主调酒师','借住寄人篱下','哥哥的朋友','闺蜜的弟弟','前任的死对头或小叔','前任重逢','白月光与替身','初恋久别重逢','双向暗恋未挑明','友情变质','地下恋情','一夜情后重逢','退婚逃婚替嫁','死对头欢喜冤家','宿敌天敌','塑料盟友共犯','互握把柄互相利用','猎人与猎物','警察与线人或嫌疑人','侦探与委托人','卧底与老大','刺客与目标','绑匪与人质','看守与阶下囚','敌国质子与皇室','正道与魔头','猎人与非人血族','研究员与实验体','收容员与收容物','伪骨科无血缘兄妹','收养资助与监护','师徒同门','主仆暗卫','饲主与人外','神明与信徒祭品','恶魔与契约者','创造者与仿生人','玩家与副本首领','穿书者与反派','哨兵与向导','救命恩人','捡到的失忆大佬','灵魂互换契约绑定','前世今生转世','末世或副本临时队友','现实死对头网上好搭子','被困同一空间的陌生人'] },
+  { key: 'loveStyle', title: '感情观与相处模式', multi: true, hint: '对应感情观与相处模式栏目（可不选）', tags: ['纯爱唯一','日久生情','一见钟情','见色起意','蓄谋已久','双向奔赴','势均力敌','引导型恋人','爹系纵容','伴侣式战友','灵魂智性共鸣','饭搭子烟火气','互怼日常','相爱相杀','成年人极限拉扯','克制又越界','高位者低头','神明跌落神坛','掌控与臣服','训狗博弈','互相折磨爱恨交织','双向救赎互为软肋','各自独立边界清晰','黏人挂件','极度双标护短','行动派冷脸兜底','嘴硬心软宠溺','沉默暗中守护','隐秘窥伺暗恋','卑微甘愿做替身','死缠烂打直球','有嘴不误会','嘴甜撒娇绿茶争宠','阴阳怪气吃醋','偏执独占病态依恋','先走肾后走心','假戏真做','权衡利弊后依然选你','浪子回头','戒断反应','人前不熟人后亲密','只谈风月不谈未来','事业优先顺便爱你','理性分析感性沦陷','吵架绝不隔夜','冷战比谁先低头','明争暗抢雄竞'] }
 ];
 
-/* =========================================================
-   三、全局状态与持久化
-   ========================================================= */
 const STORAGE_KEYS = {
   settings: 'rp_script_api_settings_v1',
   template: 'rp_script_template_v1',
+  stylePrompt: 'rp_script_style_prompt_v1',
   draft: 'rp_script_draft_v1',
   library: 'rp_script_library_v1',
-  chat: 'rp_script_chat_v1'
+  promptHistory: 'rp_script_direct_prompts_v1'
 };
 
 function createEmptyChar(index) {
-  return {
-    id: 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-    name: '角色 ' + index,
-    tags: {
-      species: [], vibe: [], personality: [], identity: [],
-      speech: [], innerCore: [], relation: [], loveStyle: []
-    },
-    locks: {}
-  };
+  return { id: 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), name: '角色 ' + index, tags: { species: [], vibe: [], personality: [], identity: [], speech: [], innerCore: [], relation: [], loveStyle: [] }, locks: {} };
 }
-
 function createEmptyDraft() {
-  return {
-    id: 'draft_' + Date.now(),
-    title: '',
-    global: {
-      countMode: ['单男主纯爱'],
-      world: [],
-      tone: [],
-      userRole: [],
-      conflict: [],
-      opening: []
-    },
-    globalLocks: {},
-    extraNotes: '',
-    characters: [createEmptyChar(1)],
-    outline: '',
-    detailRolesPart: '',
-    detailUserPart: '',
-    finalFullText: ''
-  };
+  return { id: 'draft_' + Date.now(), title: '', global: { countMode: ['单男主纯爱'], world: [], tone: [], userRole: [], conflict: [], opening: [] }, globalLocks: {}, extraNotes: '', characters: [createEmptyChar(1)], outline: '', lastOutlineTagHash: '', detailRolesPart: '', detailUserPart: '', finalFullText: '' };
 }
 
 const state = {
-  page: 'home',
-  workshopTab: 'global', // 'global' | char.id
-  studioStep: 1,
-  showOnlyDetail: false,
-  allExpanded: false,
-  openCats: { countMode: true, world: true, species: true, vibe: true },
-  activeSubTabs: {},
-  customModalTarget: null,
-  settings: {
-    baseUrl: '',
-    apiKey: '',
-    model: '',
-    models: [],
-    temperature: 0.75,
-    topP: 0.90,
-    maxTokens: 4096,
-    stream: true,
-    connStatus: 'idle' // idle | ok | err
-  },
-  template: { ...DEFAULT_TEMPLATE },
-  currentScript: createEmptyDraft(),
-  library: [],
-  chatHistory: []
+  page: 'home', workshopTab: 'global', studioStep: 1, showOnlyDetail: false, allExpanded: false, tagStripOpen: false,
+  openCats: { countMode: true, world: true, species: true, vibe: true }, activeSubTabs: {}, customModalTarget: null,
+  settings: { baseUrl: '', apiKey: '', model: '', models: [], temperature: 0.75, topP: 0.90, maxTokens: 8192, stream: true, connStatus: 'idle' },
+  template: { ...DEFAULT_TEMPLATE }, stylePrompt: '', currentScript: createEmptyDraft(), library: [], promptHistory: []
 };
 
 function loadAllStorage() {
-  try {
-    const s = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || 'null');
-    if (s) state.settings = { ...state.settings, ...s };
-  } catch (e) {}
-  try {
-    const t = JSON.parse(localStorage.getItem(STORAGE_KEYS.template) || 'null');
-    if (t && t.header) state.template = { ...DEFAULT_TEMPLATE, ...t };
-  } catch (e) {}
-  try {
-    const d = JSON.parse(localStorage.getItem(STORAGE_KEYS.draft) || 'null');
-    if (d && d.global && Array.isArray(d.characters) && d.characters.length) {
-      state.currentScript = { ...createEmptyDraft(), ...d };
-    }
-  } catch (e) {}
-  try {
-    const lib = JSON.parse(localStorage.getItem(STORAGE_KEYS.library) || '[]');
-    if (Array.isArray(lib)) state.library = lib;
-  } catch (e) {}
-  try {
-    const ch = JSON.parse(localStorage.getItem(STORAGE_KEYS.chat) || '[]');
-    if (Array.isArray(ch)) state.chatHistory = ch;
-  } catch (e) {}
+  try { const s = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || 'null'); if (s) state.settings = { ...state.settings, ...s }; } catch (e) {}
+  try { const t = JSON.parse(localStorage.getItem(STORAGE_KEYS.template) || 'null'); if (t && t.header) state.template = { ...DEFAULT_TEMPLATE, ...t }; } catch (e) {}
+  try { const sp = localStorage.getItem(STORAGE_KEYS.stylePrompt); if (sp !== null) state.stylePrompt = sp; } catch (e) {}
+  try { const d = JSON.parse(localStorage.getItem(STORAGE_KEYS.draft) || 'null'); if (d && d.global && Array.isArray(d.characters) && d.characters.length) state.currentScript = { ...createEmptyDraft(), ...d }; } catch (e) {}
+  try { const lib = JSON.parse(localStorage.getItem(STORAGE_KEYS.library) || '[]'); if (Array.isArray(lib)) state.library = lib; } catch (e) {}
+  try { const ph = JSON.parse(localStorage.getItem(STORAGE_KEYS.promptHistory) || '[]'); if (Array.isArray(ph)) state.promptHistory = ph; } catch (e) {}
 }
+function persistDraft() { try { localStorage.setItem(STORAGE_KEYS.draft, JSON.stringify(state.currentScript)); } catch (e) {} updateDraftSummary(); }
+function persistLibrary() { try { localStorage.setItem(STORAGE_KEYS.library, JSON.stringify(state.library)); } catch (e) { showToast('本地存储空间已满，请删除部分旧剧本'); } }
+function persistPromptHistory() { try { localStorage.setItem(STORAGE_KEYS.promptHistory, JSON.stringify(state.promptHistory)); } catch (e) {} }
+function archiveDraftIfNeeded() { const s = state.currentScript; if ((s.outline || '').trim() || (s.finalFullText || '').trim()) saveCurrentToLibrary(true); }
 
-function persistDraft() {
-  try { localStorage.setItem(STORAGE_KEYS.draft, JSON.stringify(state.currentScript)); } catch (e) {}
-  updateDraftSummary();
-}
-function persistLibrary() {
-  try { localStorage.setItem(STORAGE_KEYS.library, JSON.stringify(state.library)); } catch (e) {}
-}
-function persistChat() {
-  try { localStorage.setItem(STORAGE_KEYS.chat, JSON.stringify(state.chatHistory)); } catch (e) {}
-}
-
-/* =========================================================
-   四、页面切换与 UI 基础交互
-   ========================================================= */
 let toastTimer = null;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
-}
+function showToast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600); }
 
-const PAGE_TITLES = {
-  home: '剧本生成库',
-  chat: '聊天脑洞',
-  workshop: '标签工坊',
-  studio: '大纲与细拆',
-  library: '我的剧本库',
-  settings: '接口与模板'
-};
-
+const PAGE_TITLES = { home: '剧本生成库', chat: '一句话打标签', workshop: '标签工坊', studio: '大纲与细拆', library: '我的剧本库', settings: '接口与模板' };
 function switchPage(pageName) {
   state.page = pageName;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('page-' + pageName);
   if (target) target.classList.add('active');
-
   document.getElementById('topbarTitle').textContent = PAGE_TITLES[pageName] || '剧本生成库';
-
-  document.querySelectorAll('.nav-item').forEach(btn => {
-    const mapped = (pageName === 'chat' || pageName === 'studio') ? 'workshop' : pageName;
-    btn.classList.toggle('active', btn.dataset.page === mapped);
-  });
-
+  document.querySelectorAll('.nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.page === ((pageName === 'chat' || pageName === 'studio') ? 'workshop' : pageName)));
   if (pageName === 'home') renderHome();
   if (pageName === 'workshop') renderWorkshop();
-  if (pageName === 'chat') renderChat();
+  if (pageName === 'chat') renderDirectPromptPage();
   if (pageName === 'studio') renderStudio();
   if (pageName === 'library') renderLibrary();
   if (pageName === 'settings') renderSettings();
-
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updateTopbarStatus() {
-  const dot = document.getElementById('topStatusDot');
-  const txt = document.getElementById('topModelText');
+  const dot = document.getElementById('topStatusDot'), txt = document.getElementById('topModelText');
   dot.className = 'status-dot ' + (state.settings.connStatus === 'ok' ? 'ok' : state.settings.connStatus === 'err' ? 'err' : '');
-  if (state.settings.model) {
-    txt.textContent = state.settings.model;
-  } else if (state.settings.apiKey) {
-    txt.textContent = '未选模型';
-  } else {
-    txt.textContent = '配置接口';
-  }
+  txt.textContent = state.settings.model || (state.settings.apiKey ? '未选模型' : '配置接口');
 }
 
-/* =========================================================
-   五、首页渲染与三大入口启动
-   ========================================================= */
 function updateDraftSummary() {
-  const g = state.currentScript.global;
-  const gCount = Object.values(g).reduce((a, b) => a + b.length, 0);
+  const g = state.currentScript.global, gCount = Object.values(g).reduce((a, b) => a + b.length, 0);
   const cCount = state.currentScript.characters.reduce((sum, c) => sum + Object.values(c.tags).reduce((a, b) => a + b.length, 0), 0);
   const el = document.getElementById('draftSummaryText');
   if (!el) return;
-  if (gCount + cCount === 0) {
-    el.textContent = '尚未选择标签，点击直接进入标签工坊';
-  } else {
-    const worldStr = g.world.length ? g.world.slice(0, 2).join(' / ') : '未定世界观';
-    el.textContent = `${worldStr} · ${state.currentScript.characters.length}位角色 · 共选 ${gCount + cCount} 个标签`;
-  }
+  el.textContent = (gCount + cCount === 0) ? '尚未选择标签，点击直接进入标签工坊' : `${g.world.length ? g.world.slice(0, 2).join(' / ') : '自定或自由世界观'} · ${state.currentScript.characters.length}位角色 · 共选 ${gCount + cCount} 个标签`;
 }
 
 function renderHome() {
   updateDraftSummary();
   const wrap = document.getElementById('homeRecentList');
-  if (!state.library.length) {
-    wrap.innerHTML = `<div style="font-size:12.5px;color:var(--ink-3);padding:8px 0;">还没有保存过的剧本，试试上面的随机或自定剧本吧。</div>`;
-    return;
-  }
-  const recent = state.library.slice(0, 3);
-  wrap.innerHTML = recent.map(item => `
+  if (!state.library.length) { wrap.innerHTML = `<div style="font-size:12.5px;color:var(--ink-3);padding:8px 0;">还没有保存过的剧本，试试上面的随机或一句话剧本吧。</div>`; return; }
+  wrap.innerHTML = state.library.slice(0, 3).map(item => `
     <div onclick="loadFromLibrary('${item.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--surface-soft);cursor:pointer;">
       <div style="min-width:0;flex:1;padding-right:10px;">
         <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(item.title || '未命名剧本')}</div>
         <div style="font-size:11.5px;color:var(--ink-3);margin-top:2px;">${escapeHtml((item.world || []).slice(0,2).join(' · ') || '自定世界观')} · ${item.charCount || 1}位男主</div>
       </div>
       <span class="badge ${item.hasFull ? 'sage' : 'soft'}">${item.hasFull ? '已成稿' : '大纲中'}</span>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function startCustomWorkshop() {
-  state.currentScript = createEmptyDraft();
-  state.workshopTab = 'global';
-  persistDraft();
-  switchPage('workshop');
-  showToast('已创建空白自定问卷');
-}
+function startCustomWorkshop() { archiveDraftIfNeeded(); state.currentScript = createEmptyDraft(); state.workshopTab = 'global'; persistDraft(); switchPage('workshop'); showToast('已创建自定问卷，只挑想选的即可，其余留空会自动补全'); }
+function startRandomWorkshop() { archiveDraftIfNeeded(); state.currentScript = createEmptyDraft(); state.workshopTab = 'global'; randomizeAllUnlocked(true); switchPage('workshop'); showToast('程序已随机抽好一套标签，可锁住满意项继续摇'); }
 
-function startRandomWorkshop() {
-  state.currentScript = createEmptyDraft();
-  state.workshopTab = 'global';
-  randomizeAllUnlocked(true);
-  switchPage('workshop');
-  showToast('程序已随机抽好一套标签，可锁住满意项继续摇');
+function renderDirectPromptPage() {
+  const card = document.getElementById('promptHistoryCard'), list = document.getElementById('promptHistoryList');
+  if (!state.promptHistory.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = state.promptHistory.map((item, idx) => `<div class="prompt-history-item" onclick="fillDirectExampleFromHistory(${idx})"><div class="prompt-history-text">${escapeHtml(item)}</div><span class="badge soft">填入</span></div>`).join('');
 }
+function fillDirectExample(text) { const el = document.getElementById('directPromptInput'); el.value = text; el.focus(); }
+function fillDirectExampleFromHistory(idx) { if (state.promptHistory[idx]) fillDirectExample(state.promptHistory[idx]); }
+function clearPromptHistory() { state.promptHistory = []; persistPromptHistory(); renderDirectPromptPage(); showToast('已清空历史记录'); }
+function cleanTagArray(arr) { return Array.isArray(arr) ? Array.from(new Set(arr.map(s => String(s).trim()).filter(Boolean))) : []; }
 
-/* =========================================================
-   六、程序智能随机抽取引擎（绝不走AI，世界观联动合理搭配）
-   ========================================================= */
-function pickRandom(arr, count = 1, exclude = []) {
-  const pool = arr.filter(x => !exclude.includes(x));
-  const res = [];
-  const copy = [...pool];
-  for (let i = 0; i < count && copy.length; i++) {
-    const idx = Math.floor(Math.random() * copy.length);
-    res.push(copy.splice(idx, 1)[0]);
+async function generateTagsDirectly() {
+  const text = document.getElementById('directPromptInput').value.trim();
+  if (!text) return showToast('先写一句你想玩的剧本需求吧');
+  if (!ensureApiReady()) return;
+  state.promptHistory = [text, ...state.promptHistory.filter(x => x !== text)].slice(0, 8);
+  persistPromptHistory(); renderDirectPromptPage();
+
+  const btn = document.getElementById('directGenerateBtn'), loading = document.getElementById('directTagLoading');
+  btn.disabled = true; btn.textContent = '正在为你打标签...'; loading.style.display = 'inline-flex';
+  const globalCatalog = GLOBAL_CATEGORIES.map(c => `${c.key}(${c.title}): ${(c.tags || c.groups.flatMap(g => g.tags)).join('、')}`).join('\n');
+  const charCatalog = CHAR_CATEGORIES.map(c => `${c.key}(${c.title}): ${(c.tags || c.groups.flatMap(g => g.tags)).join('、')}`).join('\n');
+  const prompt = `你是剧本标签配置器。不要聊天、不要寒暄、不要解释，直接把用户需求转化成精炼的标签配置，输出严格合法的 JSON。
+规则：1、countMode 只选 1 个；其余全局分类和每位角色的 8 个分类每类只选 1 到 2 个最贴切的标签。2、personality 固定为 1 个性格反差加 1 到 2 个真实缺点。3、优先选下方词库原词，没有的可补 1 个简短自定义词。4、把用户提到的作品参考、氛围要求和全部避雷项完整写入 extraNotes。5、提到多男主则在 characters 建好对应数量角色并做出差异化，没提默认 1 位。
+全局词库：\n${globalCatalog}\n\n单角色词库：\n${charCatalog}\n\n用户需求：\n${text}
+只输出 JSON：{"global":{"countMode":["单男主纯爱"],"world":[],"tone":[],"userRole":[],"conflict":[],"opening":[]},"extraNotes":"","characters":[{"name":"角色 1","tags":{"species":[],"vibe":[],"personality":[],"identity":[],"speech":[],"innerCore":[],"relation":[],"loveStyle":[]}}]}`;
+
+  try {
+    const raw = await callLLM([{ role: 'user', content: prompt }], { streamOverride: false, temperature: 0.4 });
+    const cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const a = cleaned.indexOf('{'), b = cleaned.lastIndexOf('}');
+    if (a < 0 || b <= a) throw new Error('模型未返回有效标签结构，请重试一次');
+    const parsed = JSON.parse(cleaned.slice(a, b + 1));
+
+    archiveDraftIfNeeded();
+    const nextDraft = createEmptyDraft();
+    if (parsed.global) Object.keys(nextDraft.global).forEach(k => { if (Array.isArray(parsed.global[k])) nextDraft.global[k] = cleanTagArray(parsed.global[k]); });
+    nextDraft.global.countMode = nextDraft.global.countMode.slice(0, 1);
+    const aiExtra = (parsed.extraNotes || '').trim();
+    nextDraft.extraNotes = aiExtra ? (aiExtra.includes(text) ? aiExtra : `${aiExtra}\n原始需求与避雷：${text}`) : text;
+    if (Array.isArray(parsed.characters) && parsed.characters.length) {
+      nextDraft.characters = parsed.characters.map((c, idx) => {
+        const nc = createEmptyChar(idx + 1);
+        nc.name = (c.name && String(c.name).trim()) ? String(c.name).trim() : ('角色 ' + (idx + 1));
+        if (c.tags) Object.keys(nc.tags).forEach(k => { nc.tags[k] = cleanTagArray(c.tags[k]); });
+        return nc;
+      });
+    }
+    state.currentScript = nextDraft; state.workshopTab = 'global'; state.openCats = {};
+    persistDraft(); switchPage('workshop'); showToast('已打好标签，可增删补充，确认后生成剧本');
+  } catch (err) {
+    showToast('打标签失败：' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '一键打全套标签，直接进工坊'; loading.style.display = 'none';
   }
+}
+
+function pickRandom(arr, count = 1, exclude = []) {
+  const copy = arr.filter(x => !exclude.includes(x)), res = [];
+  for (let i = 0; i < count && copy.length; i++) res.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
   return res;
 }
-
 function detectWorldGroupIds(selectedWorlds) {
-  const worldCat = GLOBAL_CATEGORIES.find(c => c.key === 'world');
   const ids = new Set();
-  for (const w of selectedWorlds) {
-    for (const g of worldCat.groups) {
-      if (g.tags.includes(w)) {
-        if (g.id === 'apocalypse' || g.id === 'infinite') ids.add('scifi');
-        else ids.add(g.id);
-      }
-    }
-  }
+  for (const w of selectedWorlds) for (const g of GLOBAL_CATEGORIES[1].groups) if (g.tags.includes(w)) ids.add((g.id === 'apocalypse' || g.id === 'infinite') ? 'scifi' : g.id);
   return Array.from(ids);
 }
-
 function inferCharCountFromMode(modeStr) {
   if (!modeStr) return 1;
   if (modeStr.includes('三男主')) return 3;
@@ -1806,911 +694,379 @@ function inferCharCountFromMode(modeStr) {
   if (modeStr.includes('随机数量')) return 1 + Math.floor(Math.random() * 3);
   return 1;
 }
-
 function syncCharCountTo(targetCount) {
   const chars = state.currentScript.characters;
-  while (chars.length < targetCount) {
-    chars.push(createEmptyChar(chars.length + 1));
-  }
-  if (chars.length > targetCount) {
-    chars.splice(targetCount);
-  }
+  while (chars.length < targetCount) chars.push(createEmptyChar(chars.length + 1));
+  if (chars.length > targetCount) chars.splice(targetCount);
 }
-
-function randomizeCharacterFields(charObj, usedTagsByKey = {}) {
-  const worldIds = detectWorldGroupIds(state.currentScript.global.world);
-  const rawWorlds = state.currentScript.global.world;
-
-  // 1. 物种：结合世界观权重
+function randomizeCharacterFields(charObj, used = {}) {
+  const worldIds = detectWorldGroupIds(state.currentScript.global.world), rawWorlds = state.currentScript.global.world;
   if (!charObj.locks.species) {
-    const speciesAll = CHAR_CATEGORIES.find(c => c.key === 'species').tags;
     const isModernLike = worldIds.includes('modern') || worldIds.includes('republic');
-    const isABO = rawWorlds.includes('信息素世界观');
-    if (isABO) {
-      charObj.tags.species = pickRandom(['男阿尔法', '男贝塔', '男欧米伽'], 1);
-    } else if (isModernLike && Math.random() < 0.78) {
-      charObj.tags.species = ['人类男性'];
-    } else if (worldIds.includes('ancient')) {
-      charObj.tags.species = pickRandom(['人类男性', '妖鬼精怪', '人外神明'], 1);
-    } else if (worldIds.includes('western')) {
-      charObj.tags.species = pickRandom(['人类男性', '血族狼人', '人外神明', '非人怪物'], 1);
-    } else if (worldIds.includes('scifi')) {
-      charObj.tags.species = pickRandom(['人类男性', '仿生人', '觉醒人工智能', '虫族雄虫', '男阿尔法', '非人怪物'], 1);
-    } else {
-      charObj.tags.species = pickRandom(speciesAll, 1);
-    }
+    if (rawWorlds.includes('信息素世界观')) charObj.tags.species = pickRandom(['男阿尔法','男贝塔','男欧米伽'], 1);
+    else if (isModernLike && Math.random() < 0.78) charObj.tags.species = ['人类男性'];
+    else if (worldIds.includes('ancient')) charObj.tags.species = pickRandom(['人类男性','妖鬼精怪','人外神明'], 1);
+    else if (worldIds.includes('western')) charObj.tags.species = pickRandom(['人类男性','血族狼人','人外神明','非人怪物'], 1);
+    else if (worldIds.includes('scifi')) charObj.tags.species = pickRandom(['人类男性','仿生人','觉醒人工智能','虫族雄虫','男阿尔法','非人怪物'], 1);
+    else charObj.tags.species = pickRandom(CHAR_CATEGORIES[0].tags, 1);
   }
-
-  // 2. 气质
-  if (!charObj.locks.vibe) {
-    const arr = CHAR_CATEGORIES.find(c => c.key === 'vibe').tags;
-    charObj.tags.vibe = pickRandom(arr, 2, usedTagsByKey.vibe || []);
-  }
-
-  // 3. 性格反差与缺点（1个反差 + 1~2个缺点）
+  if (!charObj.locks.vibe) charObj.tags.vibe = pickRandom(CHAR_CATEGORIES[1].tags, 2, used.vibe || []);
   if (!charObj.locks.personality) {
-    const pCat = CHAR_CATEGORIES.find(c => c.key === 'personality');
-    const c1 = pickRandom(pCat.groups[0].tags, 1, usedTagsByKey.personality || []);
-    const f1 = pickRandom(pCat.groups[1].tags, Math.random() < 0.55 ? 2 : 1, usedTagsByKey.personality || []);
-    charObj.tags.personality = [...c1, ...f1];
+    const pCat = CHAR_CATEGORIES[2];
+    charObj.tags.personality = [...pickRandom(pCat.groups[0].tags, 1, used.personality || []), ...pickRandom(pCat.groups[1].tags, Math.random() < 0.55 ? 2 : 1, used.personality || [])];
   }
-
-  // 4. 身份与处境（联动世界观职业 + 1个通用处境）
   if (!charObj.locks.identity) {
-    const idCat = CHAR_CATEGORIES.find(c => c.key === 'identity');
+    const idCat = CHAR_CATEGORIES[3];
     let matchedJobs = [];
-    for (const gid of worldIds) {
-      const grp = idCat.groups.find(g => g.id === gid);
-      if (grp) matchedJobs = matchedJobs.concat(grp.tags);
-    }
+    for (const gid of worldIds) { const grp = idCat.groups.find(g => g.id === gid); if (grp) matchedJobs = matchedJobs.concat(grp.tags); }
     if (!matchedJobs.length) matchedJobs = idCat.groups[0].tags;
-    const job = pickRandom(matchedJobs, 1, usedTagsByKey.identity || []);
-    const sit = pickRandom(idCat.groups.find(g => g.id === 'situation').tags, 1);
-    charObj.tags.identity = [...job, ...sit];
+    charObj.tags.identity = [...pickRandom(matchedJobs, 1, used.identity || []), ...pickRandom(idCat.groups.find(g => g.id === 'situation').tags, 1)];
   }
-
-  // 5. 说话风格
-  if (!charObj.locks.speech) {
-    const arr = CHAR_CATEGORIES.find(c => c.key === 'speech').tags;
-    charObj.tags.speech = pickRandom(arr, Math.random() < 0.6 ? 2 : 1, usedTagsByKey.speech || []);
-  }
-
-  // 6. 内在精神内核
-  if (!charObj.locks.innerCore) {
-    const arr = CHAR_CATEGORIES.find(c => c.key === 'innerCore').tags;
-    charObj.tags.innerCore = pickRandom(arr, 1, usedTagsByKey.innerCore || []);
-  }
-
-  // 7. 双方初始关系
-  if (!charObj.locks.relation) {
-    const arr = CHAR_CATEGORIES.find(c => c.key === 'relation').tags;
-    charObj.tags.relation = pickRandom(arr, Math.random() < 0.45 ? 2 : 1, usedTagsByKey.relation || []);
-  }
-
-  // 8. 感情观与相处模式
-  if (!charObj.locks.loveStyle) {
-    const arr = CHAR_CATEGORIES.find(c => c.key === 'loveStyle').tags;
-    charObj.tags.loveStyle = pickRandom(arr, Math.random() < 0.6 ? 2 : 1, usedTagsByKey.loveStyle || []);
-  }
+  if (!charObj.locks.speech) charObj.tags.speech = pickRandom(CHAR_CATEGORIES[4].tags, Math.random() < 0.6 ? 2 : 1, used.speech || []);
+  if (!charObj.locks.innerCore) charObj.tags.innerCore = pickRandom(CHAR_CATEGORIES[5].tags, 1, used.innerCore || []);
+  if (!charObj.locks.relation) charObj.tags.relation = pickRandom(CHAR_CATEGORIES[6].tags, Math.random() < 0.45 ? 2 : 1, used.relation || []);
+  if (!charObj.locks.loveStyle) charObj.tags.loveStyle = pickRandom(CHAR_CATEGORIES[7].tags, Math.random() < 0.6 ? 2 : 1, used.loveStyle || []);
 }
-
 function randomizeAllUnlocked(silent = false) {
-  const g = state.currentScript.global;
-  const locks = state.currentScript.globalLocks;
-
+  const g = state.currentScript.global, locks = state.currentScript.globalLocks;
   if (!locks.countMode) {
-    const modes = GLOBAL_CATEGORIES.find(c => c.key === 'countMode').tags;
-    // 适当提升单/双男主常见概率，保留全部可能
     const r = Math.random();
     if (r < 0.48) g.countMode = ['单男主纯爱'];
     else if (r < 0.82) g.countMode = pickRandom(['双男主修罗场','红白玫瑰双男主','兄弟双男主','死对头双男主','前任与现任','师徒或长辈晚辈'], 1);
-    else g.countMode = pickRandom(modes, 1);
+    else g.countMode = pickRandom(GLOBAL_CATEGORIES[0].tags, 1);
   }
-
-  const targetCount = inferCharCountFromMode(g.countMode[0]);
-  syncCharCountTo(targetCount);
-
-  if (!locks.world) {
-    const wGroups = GLOBAL_CATEGORIES.find(c => c.key === 'world').groups;
-    const primaryGroup = pickRandom(wGroups, 1)[0];
-    const picked = pickRandom(primaryGroup.tags, Math.random() < 0.35 ? 2 : 1);
-    g.world = picked;
-  }
-
-  if (!locks.tone) {
-    g.tone = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === 'tone').tags, 2 + (Math.random() < 0.35 ? 1 : 0));
-  }
-
-  if (!locks.userRole) {
-    g.userRole = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === 'userRole').tags, Math.random() < 0.55 ? 2 : 1);
-  }
-
-  if (!locks.conflict) {
-    g.conflict = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === 'conflict').tags, 2);
-  }
-
-  if (!locks.opening) {
-    g.opening = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === 'opening').tags, 1);
-  }
-
+  syncCharCountTo(inferCharCountFromMode(g.countMode[0]));
+  if (!locks.world) g.world = pickRandom(pickRandom(GLOBAL_CATEGORIES[1].groups, 1)[0].tags, Math.random() < 0.35 ? 2 : 1);
+  if (!locks.tone) g.tone = pickRandom(GLOBAL_CATEGORIES[2].tags, 2 + (Math.random() < 0.35 ? 1 : 0));
+  if (!locks.userRole) g.userRole = pickRandom(GLOBAL_CATEGORIES[3].tags, Math.random() < 0.55 ? 2 : 1);
+  if (!locks.conflict) g.conflict = pickRandom(GLOBAL_CATEGORIES[4].tags, 2);
+  if (!locks.opening) g.opening = pickRandom(GLOBAL_CATEGORIES[5].tags, 1);
   const used = { vibe: [], personality: [], identity: [], speech: [], innerCore: [], relation: [], loveStyle: [] };
   state.currentScript.characters.forEach((ch, idx) => {
     if (!ch.name || /^角色\s*\d+$/.test(ch.name)) ch.name = '角色 ' + (idx + 1);
     randomizeCharacterFields(ch, used);
     Object.keys(used).forEach(k => used[k].push(...(ch.tags[k] || [])));
   });
-
-  if (state.workshopTab !== 'global' && !state.currentScript.characters.some(c => c.id === state.workshopTab)) {
-    state.workshopTab = 'global';
-  }
-
-  persistDraft();
-  renderWorkshop();
+  if (state.workshopTab !== 'global' && !state.currentScript.characters.some(c => c.id === state.workshopTab)) state.workshopTab = 'global';
+  persistDraft(); renderWorkshop();
   if (!silent) showToast('已重新随机抽取未锁定项');
 }
-
 function randomizeSingleCategory(scope, catKey, event) {
   event.stopPropagation();
   if (scope === 'global') {
     const g = state.currentScript.global;
-    if (catKey === 'countMode') {
-      g.countMode = pickRandom(GLOBAL_CATEGORIES[0].tags, 1);
-      syncCharCountTo(inferCharCountFromMode(g.countMode[0]));
-    } else if (catKey === 'world') {
-      const grp = pickRandom(GLOBAL_CATEGORIES[1].groups, 1)[0];
-      g.world = pickRandom(grp.tags, 1);
-    } else {
-      const cat = GLOBAL_CATEGORIES.find(c => c.key === catKey);
-      g[catKey] = pickRandom(cat.tags, catKey === 'opening' ? 1 : 2);
-    }
+    if (catKey === 'countMode') { g.countMode = pickRandom(GLOBAL_CATEGORIES[0].tags, 1); syncCharCountTo(inferCharCountFromMode(g.countMode[0])); }
+    else if (catKey === 'world') g.world = pickRandom(pickRandom(GLOBAL_CATEGORIES[1].groups, 1)[0].tags, 1);
+    else g[catKey] = pickRandom(GLOBAL_CATEGORIES.find(c => c.key === catKey).tags, catKey === 'opening' ? 1 : 2);
   } else {
-    const ch = getCurrentChar();
-    if (!ch) return;
-    const savedLocks = { ...ch.locks };
-    // 临时锁住其他，只摇当前项
+    const ch = getCurrentChar(); if (!ch) return;
+    const saved = { ...ch.locks };
     CHAR_CATEGORIES.forEach(c => { ch.locks[c.key] = (c.key !== catKey); });
-    randomizeCharacterFields(ch, {});
-    ch.locks = savedLocks;
+    randomizeCharacterFields(ch, {}); ch.locks = saved;
   }
-  persistDraft();
-  renderWorkshop();
-  showToast('已重摇该模块');
+  persistDraft(); renderWorkshop(); showToast('已重摇该模块');
 }
-
-function randomizeSingleCharacter() {
-  const ch = getCurrentChar();
-  if (!ch) return;
-  randomizeCharacterFields(ch, {});
-  persistDraft();
-  renderWorkshop();
-  showToast(`已重摇 ${ch.name} 未锁定项`);
-}
-
+function randomizeSingleCharacter() { const ch = getCurrentChar(); if (!ch) return; randomizeCharacterFields(ch, {}); persistDraft(); renderWorkshop(); showToast(`已重摇 ${ch.name} 未锁定项`); }
 function toggleLock(scope, catKey, event) {
   event.stopPropagation();
-  if (scope === 'global') {
-    state.currentScript.globalLocks[catKey] = !state.currentScript.globalLocks[catKey];
-  } else {
-    const ch = getCurrentChar();
-    if (!ch) return;
-    ch.locks[catKey] = !ch.locks[catKey];
-  }
-  persistDraft();
-  renderWorkshop();
+  if (scope === 'global') state.currentScript.globalLocks[catKey] = !state.currentScript.globalLocks[catKey];
+  else { const ch = getCurrentChar(); if (!ch) return; ch.locks[catKey] = !ch.locks[catKey]; }
+  persistDraft(); renderWorkshop();
 }
 
-/* =========================================================
-   七、标签确认工坊渲染与交互
-   ========================================================= */
-function getCurrentChar() {
-  return state.currentScript.characters.find(c => c.id === state.workshopTab) || null;
-}
-
-function countGlobalTags() {
-  return Object.values(state.currentScript.global).reduce((a, b) => a + b.length, 0);
-}
-function countCharTags(ch) {
-  return Object.values(ch.tags).reduce((a, b) => a + b.length, 0);
-}
+function getCurrentChar() { return state.currentScript.characters.find(c => c.id === state.workshopTab) || null; }
+function countGlobalTags() { return Object.values(state.currentScript.global).reduce((a, b) => a + b.length, 0); }
+function countCharTags(ch) { return Object.values(ch.tags).reduce((a, b) => a + b.length, 0); }
 
 function renderWorkshop() {
-  // 1. 顶部横滑分组胶囊
-  const rail = document.getElementById('workshopRail');
-  const gCount = countGlobalTags();
-  let html = `
-    <button class="rail-pill ${state.workshopTab === 'global' ? 'active' : ''}" onclick="setWorkshopTab('global')">
-      <span class="rail-sub">共用</span>
-      <span class="rail-main">全局</span>
-      <span class="rail-count">${gCount} 项</span>
-    </button>
-  `;
+  const rail = document.getElementById('workshopRail'), gCount = countGlobalTags();
+  let html = `<button class="rail-pill ${state.workshopTab === 'global' ? 'active' : ''}" onclick="setWorkshopTab('global')"><span class="rail-sub">共用</span><span class="rail-main">全局</span><span class="rail-count">${gCount} 项</span></button>`;
   state.currentScript.characters.forEach((ch, idx) => {
-    const cnt = countCharTags(ch);
-    html += `
-      <button class="rail-pill ${state.workshopTab === ch.id ? 'active' : ''}" onclick="setWorkshopTab('${ch.id}')">
-        <span class="rail-sub">男主${idx + 1}</span>
-        <span class="rail-main">${escapeHtml(ch.name || ('角色 ' + (idx + 1)))}</span>
-        <span class="rail-count">${cnt} 项</span>
-      </button>
-    `;
+    html += `<button class="rail-pill ${state.workshopTab === ch.id ? 'active' : ''}" onclick="setWorkshopTab('${ch.id}')"><span class="rail-sub">男主${idx + 1}</span><span class="rail-main">${escapeHtml(ch.name || ('角色 ' + (idx + 1)))}</span><span class="rail-count">${countCharTags(ch)} 项</span></button>`;
   });
-  html += `
-    <button class="rail-pill add-pill" onclick="addCharacter()">
-      <span class="rail-sub">新增</span>
-      <span class="rail-main">+</span>
-      <span class="rail-count">角色</span>
-    </button>
-  `;
+  html += `<button class="rail-pill add-pill" onclick="addCharacter()"><span class="rail-sub">新增</span><span class="rail-main">+</span><span class="rail-count">角色</span></button>`;
   rail.innerHTML = html;
 
-  // 2. 总标签数
   const totalAll = gCount + state.currentScript.characters.reduce((s, c) => s + countCharTags(c), 0);
   document.getElementById('totalTagCountBadge').textContent = `总计 ${totalAll} 项`;
-
-  // 3. 角色信息头 / 额外脑洞框显隐
-  const charMeta = document.getElementById('charMetaSection');
-  const extraCard = document.getElementById('extraNoteCard');
-  const container = document.getElementById('workshopCategories');
-
+  const charMeta = document.getElementById('charMetaSection'), extraCard = document.getElementById('extraNoteCard'), container = document.getElementById('workshopCategories');
   if (state.workshopTab === 'global') {
-    charMeta.style.display = 'none';
-    extraCard.style.display = 'block';
+    charMeta.style.display = 'none'; extraCard.style.display = 'block';
     document.getElementById('extraNotesInput').value = state.currentScript.extraNotes || '';
     container.innerHTML = GLOBAL_CATEGORIES.map(cat => renderCategoryCard('global', cat, state.currentScript.global[cat.key] || [], !!state.currentScript.globalLocks[cat.key])).join('');
   } else {
-    const ch = getCurrentChar();
-    if (!ch) { state.workshopTab = 'global'; renderWorkshop(); return; }
-    charMeta.style.display = 'block';
-    extraCard.style.display = 'none';
+    const ch = getCurrentChar(); if (!ch) { state.workshopTab = 'global'; renderWorkshop(); return; }
+    charMeta.style.display = 'block'; extraCard.style.display = 'none';
     document.getElementById('charNameInput').value = ch.name || '';
     document.getElementById('deleteCharBtn').style.display = state.currentScript.characters.length > 1 ? 'inline-flex' : 'none';
     container.innerHTML = CHAR_CATEGORIES.map(cat => renderCategoryCard('char', cat, ch.tags[cat.key] || [], !!ch.locks[cat.key])).join('');
   }
 }
 
-function renderCategoryCard(scope, cat, selectedArr, isLocked) {
-  const isOpen = !!state.openCats[cat.key];
-  const preview = selectedArr.length ? selectedArr.join(' · ') : (cat.hint || '点击展开挑选');
+function buildCategoryPreview(cat, selectedArr) {
+  if (!selectedArr.length) return cat.hint || '点击展开挑选（可不选）';
+  if (cat.previewByGroup && cat.groups) {
+    const parts = [];
+    cat.groups.forEach(g => { const inGrp = selectedArr.filter(t => g.tags.includes(t)); if (inGrp.length) parts.push(`${g.name.replace(/职业|身份/g, '')}：${inGrp.join('、')}`); });
+    const preset = new Set(cat.groups.flatMap(g => g.tags)), custom = selectedArr.filter(t => !preset.has(t));
+    if (custom.length) parts.push(`自定义：${custom.join('、')}`);
+    return parts.join('  ·  ');
+  }
+  return selectedArr.join(' · ');
+}
 
-  // 收集该类目下所有预设标签，用于识别用户自定义词条
+function renderCategoryCard(scope, cat, selectedArr, isLocked) {
+  const isOpen = !!state.openCats[cat.key], preview = buildCategoryPreview(cat, selectedArr);
   const presetSet = new Set();
   if (cat.tags) cat.tags.forEach(t => presetSet.add(t));
   if (cat.groups) cat.groups.forEach(g => g.tags.forEach(t => presetSet.add(t)));
   const customSelected = selectedArr.filter(t => !presetSet.has(t));
+  const chipHtml = (tag) => `<button class="chip ${selectedArr.includes(tag) ? 'selected' : ''}" onclick="toggleTag('${scope}','${cat.key}',${cat.multi},'${escapeAttrJs(tag)}')">${escapeHtml(tag)}</button>`;
 
   let bodyHtml = '';
   if (cat.groups) {
-    let groups = [...cat.groups];
-    let matchedIds = [];
+    let groups = [...cat.groups], matchedIds = [];
     if (cat.linkedToWorld) {
       matchedIds = detectWorldGroupIds(state.currentScript.global.world);
-      // 将匹配世界观的职业分组置顶（通用处境保持最后）
-      const matched = groups.filter(g => matchedIds.includes(g.id));
-      const others = groups.filter(g => !matchedIds.includes(g.id) && g.id !== 'situation');
-      const sit = groups.find(g => g.id === 'situation');
+      const matched = groups.filter(g => matchedIds.includes(g.id)), others = groups.filter(g => !matchedIds.includes(g.id) && g.id !== 'situation'), sit = groups.find(g => g.id === 'situation');
       groups = [...matched, ...others, ...(sit ? [sit] : [])];
     }
-
     const tabKey = scope + '_' + cat.key;
     let activeGrpId = state.activeSubTabs[tabKey];
-    if (!activeGrpId || !groups.some(g => g.id === activeGrpId)) {
-      activeGrpId = groups[0].id;
-    }
-
-    // 性格反差与缺点同时展示或分组切换：这里统一用清爽子标签条，点选极快
-    bodyHtml += `<div class="sub-group-bar">` + groups.map(g => {
-      const isMatch = matchedIds.includes(g.id);
-      const countInGrp = g.tags.filter(t => selectedArr.includes(t)).length;
-      return `<button class="sub-tab ${activeGrpId === g.id ? 'active' : ''} ${isMatch ? 'match-hint' : ''}" onclick="setSubTab('${tabKey}','${g.id}')">${escapeHtml(g.name)}${isMatch ? ' · 推荐' : ''}${countInGrp ? ` (${countInGrp})` : ''}</button>`;
-    }).join('') + `</div>`;
-
+    if (!activeGrpId || !groups.some(g => g.id === activeGrpId)) activeGrpId = groups[0].id;
     const activeGrp = groups.find(g => g.id === activeGrpId) || groups[0];
-    bodyHtml += `<div class="chip-wrap">` + activeGrp.tags.map(tag => {
-      const sel = selectedArr.includes(tag);
-      return `<button class="chip ${sel ? 'selected' : ''}" onclick="toggleTag('${scope}','${cat.key}',${cat.multi},'${escapeJs(tag)}')">${escapeHtml(tag)}</button>`;
-    }).join('');
-    bodyHtml += renderCustomChipsHtml(scope, cat.key, customSelected);
-    bodyHtml += `</div>`;
+    bodyHtml += `<div class="seg-track">` + groups.map(g => {
+      const isMatch = matchedIds.includes(g.id), cnt = g.tags.filter(t => selectedArr.includes(t)).length;
+      return `<button class="seg-btn ${activeGrpId === g.id ? 'active' : ''}" onclick="setSubTab('${tabKey}','${g.id}')">${escapeHtml(g.name)}${isMatch ? '<span class="seg-rec">推荐</span>' : ''}${cnt ? `<span class="seg-count">${cnt}</span>` : ''}</button>`;
+    }).join('') + `</div>`;
+    if (activeGrp.desc) bodyHtml += `<div class="seg-desc">${escapeHtml(activeGrp.desc)}</div>`;
+    bodyHtml += `<div class="chip-wrap">` + activeGrp.tags.map(chipHtml).join('') + renderCustomChipsHtml(scope, cat.key, customSelected) + `</div>`;
   } else {
-    bodyHtml += `<div class="chip-wrap">` + cat.tags.map(tag => {
-      const sel = selectedArr.includes(tag);
-      return `<button class="chip ${sel ? 'selected' : ''}" onclick="toggleTag('${scope}','${cat.key}',${cat.multi},'${escapeJs(tag)}')">${escapeHtml(tag)}</button>`;
-    }).join('');
-    bodyHtml += renderCustomChipsHtml(scope, cat.key, customSelected);
-    bodyHtml += `</div>`;
+    bodyHtml += `<div class="chip-wrap">` + cat.tags.map(chipHtml).join('') + renderCustomChipsHtml(scope, cat.key, customSelected) + `</div>`;
   }
 
-  return `
-    <div class="cat-card ${isOpen ? 'open' : ''}">
-      <div class="cat-head" onclick="toggleCatOpen('${cat.key}')">
-        <div class="cat-head-left">
-          <div class="cat-title-row">
-            <span class="cat-title">${escapeHtml(cat.title)}</span>
-            ${selectedArr.length ? `<span class="badge soft">${selectedArr.length}</span>` : ''}
-          </div>
-          <div class="cat-preview ${selectedArr.length ? 'has-val' : ''}">${escapeHtml(preview)}</div>
-        </div>
-        <div class="cat-tools">
-          <button class="mini-tool ${isLocked ? 'locked' : ''}" title="${isLocked ? '已锁定，重摇时保留' : '锁定此项'}" onclick="toggleLock('${scope}','${cat.key}',event)">
-            ${isLocked
-              ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`
-              : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`}
-          </button>
-          <button class="mini-tool" title="单摇此模块" onclick="randomizeSingleCategory('${scope}','${cat.key}',event)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>
-          </button>
-          <span class="cat-chevron">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </span>
-        </div>
+  return `<div class="cat-card ${isOpen ? 'open' : ''}">
+    <div class="cat-head" onclick="toggleCatOpen('${cat.key}')">
+      <div class="cat-head-left">
+        <div class="cat-title-row"><span class="cat-title">${escapeHtml(cat.title)}</span>${selectedArr.length ? `<span class="badge soft">${selectedArr.length}</span>` : ''}</div>
+        <div class="cat-preview ${selectedArr.length ? 'has-val' : ''}">${escapeHtml(preview)}</div>
       </div>
-      <div class="cat-body">${bodyHtml}</div>
+      <div class="cat-tools">
+        <button class="mini-tool ${isLocked ? 'locked' : ''}" onclick="toggleLock('${scope}','${cat.key}',event)">${isLocked ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>` : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`}</button>
+        <button class="mini-tool" onclick="randomizeSingleCategory('${scope}','${cat.key}',event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg></button>
+        <span class="cat-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
     </div>
-  `;
+    <div class="cat-body">${bodyHtml}</div>
+  </div>`;
 }
-
 function renderCustomChipsHtml(scope, catKey, customSelected) {
-  let out = customSelected.map(t =>
-    `<button class="chip custom-tag-selected" onclick="toggleTag('${scope}','${catKey}',true,'${escapeJs(t)}')">${escapeHtml(t)} ×</button>`
-  ).join('');
-  out += `<button class="chip custom-chip" onclick="openCustomTagModal('${scope}','${catKey}')">+ 自定义</button>`;
-  return out;
+  return customSelected.map(t => `<button class="chip custom-tag-selected" onclick="toggleTag('${scope}','${catKey}',true,'${escapeAttrJs(t)}')">${escapeHtml(t)} ×</button>`).join('') + `<button class="chip custom-chip" onclick="openCustomTagModal('${scope}','${catKey}')">+ 自定义</button>`;
 }
 
-function setWorkshopTab(tabId) {
-  state.workshopTab = tabId;
-  renderWorkshop();
-}
-
-function toggleCatOpen(key) {
-  state.openCats[key] = !state.openCats[key];
-  renderWorkshop();
-}
-
-function toggleExpandAll() {
-  state.allExpanded = !state.allExpanded;
-  const list = state.workshopTab === 'global' ? GLOBAL_CATEGORIES : CHAR_CATEGORIES;
-  list.forEach(c => { state.openCats[c.key] = state.allExpanded; });
-  renderWorkshop();
-}
-
-function setSubTab(tabKey, grpId) {
-  state.activeSubTabs[tabKey] = grpId;
-  renderWorkshop();
-}
-
+function setWorkshopTab(tabId) { state.workshopTab = tabId; renderWorkshop(); }
+function toggleCatOpen(key) { state.openCats[key] = !state.openCats[key]; renderWorkshop(); }
+function toggleExpandAll() { state.allExpanded = !state.allExpanded; (state.workshopTab === 'global' ? GLOBAL_CATEGORIES : CHAR_CATEGORIES).forEach(c => { state.openCats[c.key] = state.allExpanded; }); renderWorkshop(); }
+function setSubTab(tabKey, grpId) { state.activeSubTabs[tabKey] = grpId; renderWorkshop(); }
 function toggleTag(scope, catKey, isMulti, tag) {
   let arr;
-  if (scope === 'global') {
-    arr = state.currentScript.global[catKey] || (state.currentScript.global[catKey] = []);
-  } else {
-    const ch = getCurrentChar();
-    if (!ch) return;
-    arr = ch.tags[catKey] || (ch.tags[catKey] = []);
-  }
-
+  if (scope === 'global') arr = state.currentScript.global[catKey] || (state.currentScript.global[catKey] = []);
+  else { const ch = getCurrentChar(); if (!ch) return; arr = ch.tags[catKey] || (ch.tags[catKey] = []); }
   const idx = arr.indexOf(tag);
-  if (idx >= 0) {
-    arr.splice(idx, 1);
-  } else {
-    if (!isMulti) arr.length = 0;
-    arr.push(tag);
-  }
-
+  if (idx >= 0) arr.splice(idx, 1); else { if (!isMulti) arr.length = 0; arr.push(tag); }
   if (scope === 'global' && catKey === 'countMode' && arr.length) {
     const targetCount = inferCharCountFromMode(arr[0]);
-    if (targetCount > state.currentScript.characters.length) {
-      syncCharCountTo(targetCount);
-      showToast(`已为你自动建好 ${targetCount} 个角色标签页`);
-    }
+    if (targetCount > state.currentScript.characters.length) { syncCharCountTo(targetCount); showToast(`已为你自动建好 ${targetCount} 个角色标签页`); }
   }
-
-  persistDraft();
-  renderWorkshop();
+  persistDraft(); renderWorkshop();
 }
-
-function addCharacter() {
-  const nextIdx = state.currentScript.characters.length + 1;
-  const ch = createEmptyChar(nextIdx);
-  state.currentScript.characters.push(ch);
-  state.workshopTab = ch.id;
-  persistDraft();
-  renderWorkshop();
-  showToast(`已添加 ${ch.name}`);
-}
-
+function addCharacter() { const ch = createEmptyChar(state.currentScript.characters.length + 1); state.currentScript.characters.push(ch); state.workshopTab = ch.id; persistDraft(); renderWorkshop(); showToast(`已添加 ${ch.name}`); }
 function deleteCurrentCharacter() {
-  if (state.currentScript.characters.length <= 1) {
-    showToast('至少需要保留一位角色');
-    return;
-  }
+  if (state.currentScript.characters.length <= 1) return showToast('至少需要保留一位角色');
   const idx = state.currentScript.characters.findIndex(c => c.id === state.workshopTab);
-  if (idx >= 0) {
-    state.currentScript.characters.splice(idx, 1);
-    state.workshopTab = 'global';
-    persistDraft();
-    renderWorkshop();
-    showToast('已删除该角色');
-  }
+  if (idx >= 0) { state.currentScript.characters.splice(idx, 1); state.workshopTab = 'global'; persistDraft(); renderWorkshop(); showToast('已删除该角色'); }
 }
-
 function updateCurrentCharName(val) {
-  const ch = getCurrentChar();
-  if (!ch) return;
-  ch.name = val;
-  persistDraft();
-  // 只更新顶部对应胶囊文字，避免打断输入焦点
-  const railBtns = document.querySelectorAll('#workshopRail .rail-pill');
-  const idx = state.currentScript.characters.findIndex(c => c.id === ch.id);
-  if (idx >= 0 && railBtns[idx + 1]) {
-    railBtns[idx + 1].querySelector('.rail-main').textContent = val || ('角色 ' + (idx + 1));
-  }
+  const ch = getCurrentChar(); if (!ch) return;
+  ch.name = val; persistDraft();
+  const railBtns = document.querySelectorAll('#workshopRail .rail-pill'), idx = state.currentScript.characters.findIndex(c => c.id === ch.id);
+  if (idx >= 0 && railBtns[idx + 1]) railBtns[idx + 1].querySelector('.rail-main').textContent = val || ('角色 ' + (idx + 1));
 }
-
-function updateExtraNotes(val) {
-  state.currentScript.extraNotes = val;
-  persistDraft();
-}
-
+function updateExtraNotes(val) { state.currentScript.extraNotes = val; persistDraft(); }
 function clearCurrentTab() {
-  if (state.workshopTab === 'global') {
-    Object.keys(state.currentScript.global).forEach(k => state.currentScript.global[k] = []);
-    state.currentScript.extraNotes = '';
-  } else {
-    const ch = getCurrentChar();
-    if (ch) Object.keys(ch.tags).forEach(k => ch.tags[k] = []);
-  }
-  persistDraft();
-  renderWorkshop();
-  showToast('已清空当前页标签');
+  if (state.workshopTab === 'global') { Object.keys(state.currentScript.global).forEach(k => state.currentScript.global[k] = []); state.currentScript.extraNotes = ''; }
+  else { const ch = getCurrentChar(); if (ch) Object.keys(ch.tags).forEach(k => ch.tags[k] = []); }
+  persistDraft(); renderWorkshop(); showToast('已清空当前页标签');
 }
-
-/* 自定义标签弹窗 */
-function openCustomTagModal(scope, catKey) {
-  state.customModalTarget = { scope, catKey };
-  document.getElementById('customTagInput').value = '';
-  document.getElementById('customTagModal').classList.add('show');
-  setTimeout(() => document.getElementById('customTagInput').focus(), 60);
-}
-function closeCustomTagModal() {
-  document.getElementById('customTagModal').classList.remove('show');
-  state.customModalTarget = null;
-}
+function openCustomTagModal(scope, catKey) { state.customModalTarget = { scope, catKey }; document.getElementById('customTagInput').value = ''; document.getElementById('customTagModal').classList.add('show'); setTimeout(() => document.getElementById('customTagInput').focus(), 60); }
+function closeCustomTagModal() { document.getElementById('customTagModal').classList.remove('show'); state.customModalTarget = null; }
 function confirmAddCustomTag() {
   const raw = document.getElementById('customTagInput').value.trim();
   if (!raw || !state.customModalTarget) return closeCustomTagModal();
   const items = raw.split(/[，,、\n]+/).map(s => s.trim()).filter(Boolean);
-  const { scope, catKey } = state.customModalTarget;
-  const arr = scope === 'global' ? state.currentScript.global[catKey] : getCurrentChar().tags[catKey];
+  const { scope, catKey } = state.customModalTarget, arr = scope === 'global' ? state.currentScript.global[catKey] : getCurrentChar().tags[catKey];
   items.forEach(item => { if (!arr.includes(item)) arr.push(item); });
-  persistDraft();
-  closeCustomTagModal();
-  renderWorkshop();
-  showToast(`已添加 ${items.length} 个自定义标签`);
+  persistDraft(); closeCustomTagModal(); renderWorkshop(); showToast(`已添加 ${items.length} 个自定义标签`);
 }
 
-/* =========================================================
-   八、OpenAI 兼容 API 调用核心（支持流式与非流式）
-   ========================================================= */
-function getNormalizedBaseUrl() {
-  let u = (state.settings.baseUrl || '').trim().replace(/\/+$/, '');
-  return u;
-}
-
-function ensureApiReady() {
-  if (!getNormalizedBaseUrl() || !state.settings.apiKey || !state.settings.model) {
-    showToast('请先在设置页填写接口地址、Key 并获取模型');
-    switchPage('settings');
-    return false;
-  }
-  return true;
-}
+let lastFinishReason = '';
+function getNormalizedBaseUrl() { return (state.settings.baseUrl || '').trim().replace(/\/+$/, ''); }
+function ensureApiReady() { if (!getNormalizedBaseUrl() || !state.settings.apiKey || !state.settings.model) { showToast('请先在设置页填写接口地址、Key 并获取模型'); switchPage('settings'); return false; } return true; }
 
 async function callLLM(messages, { onChunk = null, maxTokens = null, temperature = null, streamOverride = null } = {}) {
-  const baseUrl = getNormalizedBaseUrl();
+  lastFinishReason = '';
   const useStream = streamOverride !== null ? streamOverride : !!state.settings.stream;
-  const body = {
-    model: state.settings.model,
-    messages,
-    temperature: temperature !== null ? temperature : Number(state.settings.temperature),
-    top_p: Number(state.settings.topP),
-    max_tokens: maxTokens !== null ? maxTokens : Number(state.settings.maxTokens),
-    stream: useStream
-  };
-
-  const resp = await fetch(`${baseUrl}/chat/completions`, {
+  const resp = await fetch(`${getNormalizedBaseUrl()}/chat/completions`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${state.settings.apiKey.trim()}`
-    },
-    body: JSON.stringify(body)
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.settings.apiKey.trim()}` },
+    body: JSON.stringify({ model: state.settings.model, messages, temperature: temperature !== null ? temperature : Number(state.settings.temperature), top_p: Number(state.settings.topP), max_tokens: maxTokens !== null ? maxTokens : Number(state.settings.maxTokens), stream: useStream })
   });
-
-  if (!resp.ok) {
-    const errText = await resp.text().catch(() => '');
-    throw new Error(`接口返回 ${resp.status}：${errText.slice(0, 160)}`);
-  }
-
+  if (!resp.ok) throw new Error(`接口返回 ${resp.status}：${(await resp.text().catch(() => '')).slice(0, 160)}`);
   if (!useStream) {
-    const data = await resp.json();
-    const text = data.choices?.[0]?.message?.content || '';
+    const data = await resp.json(), choice = data.choices?.[0] || {}, text = choice.message?.content || '';
+    lastFinishReason = choice.finish_reason || '';
     if (onChunk) onChunk(text);
     return text;
   }
-
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder('utf-8');
-  let buffer = '';
-  let fullText = '';
-
+  const reader = resp.body.getReader(), decoder = new TextDecoder('utf-8');
+  let buffer = '', fullText = '';
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
+    const lines = buffer.split('\n'); buffer = lines.pop() || '';
     for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed.startsWith('data:')) continue;
       const payload = trimmed.slice(5).trim();
       if (payload === '[DONE]') continue;
       try {
-        const json = JSON.parse(payload);
-        const delta = json.choices?.[0]?.delta?.content || '';
-        if (delta) {
-          fullText += delta;
-          if (onChunk) onChunk(fullText);
-        }
+        const json = JSON.parse(payload), choice = json.choices?.[0] || {};
+        if (choice.finish_reason) lastFinishReason = choice.finish_reason;
+        const delta = choice.delta?.content || '';
+        if (delta) { fullText += delta; if (onChunk) onChunk(fullText); }
       } catch (e) {}
     }
   }
   return fullText;
 }
 
-/* =========================================================
-   九、聊天脑洞与一键提取标签
-   ========================================================= */
-function renderChat() {
-  const wrap = document.getElementById('chatMessages');
-  if (!state.chatHistory.length) {
-    wrap.innerHTML = `
-      <div class="msg-row ai">
-        <div class="msg-bubble">你好呀，告诉我你想玩什么类型的角色扮演脑洞。比如世界观、想要几个男主、偏虐还是日常烟火气、或者任何一闪而过的画面。聊顺了点下面的一键提取标签，我直接帮你把十二大类标签挑好送进工坊。</div>
-      </div>
-    `;
-    return;
-  }
-  wrap.innerHTML = state.chatHistory.map(m => `
-    <div class="msg-row ${m.role === 'user' ? 'user' : 'ai'}">
-      <div class="msg-bubble">${escapeHtml(m.content)}</div>
-    </div>
-  `).join('');
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-}
+function computeCurrentTagHash() { return JSON.stringify({ g: state.currentScript.global, e: state.currentScript.extraNotes, c: state.currentScript.characters.map(ch => ({ n: ch.name, t: ch.tags })) }); }
+function getStylePromptBlock() { const sp = (state.stylePrompt || '').trim(); return sp ? `\n\n【剧本文笔限制指令（最高优先级，必须严格遵守）】\n${sp}` : ''; }
 
-function clearChatHistory() {
-  state.chatHistory = [];
-  persistChat();
-  renderChat();
-  showToast('对话已清空');
-}
-
-async function sendChatMessage() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-  if (!ensureApiReady()) return;
-
-  input.value = '';
-  state.chatHistory.push({ role: 'user', content: text });
-  state.chatHistory.push({ role: 'assistant', content: '正在构思...' });
-  renderChat();
-
-  const sys = {
-    role: 'system',
-    content: '你是专业的女性向角色扮演剧本脑洞策划师。你的任务是陪用户轻松发散灵感，帮她细化世界观、角色反差、人物关系拉扯感和开局切入点。严禁写到大结局，保持回复精炼有画面感，拒绝套路烂梗和说教，自然提出一两个有趣的脑洞方向供用户挑选。'
-  };
-  const sendMsgs = [sys, ...state.chatHistory.slice(0, -1)];
-  const aiIdx = state.chatHistory.length - 1;
-
-  document.getElementById('sendChatBtn').disabled = true;
-  try {
-    const reply = await callLLM(sendMsgs, {
-      onChunk: (partial) => {
-        state.chatHistory[aiIdx].content = partial;
-        renderChat();
-      }
-    });
-    state.chatHistory[aiIdx].content = reply;
-    persistChat();
-    renderChat();
-  } catch (err) {
-    state.chatHistory[aiIdx].content = '生成失败：' + err.message;
-    renderChat();
-  } finally {
-    document.getElementById('sendChatBtn').disabled = false;
-  }
-}
-
-async function extractTagsFromChat() {
-  if (!state.chatHistory.length) {
-    showToast('先随便聊几句你的想法吧');
-    return;
-  }
-  if (!ensureApiReady()) return;
-
-  const btn = document.getElementById('extractTagsBtn');
-  btn.disabled = true;
-  btn.textContent = '正在提取并匹配标签...';
-
-  const globalCatalog = GLOBAL_CATEGORIES.map(c => {
-    const all = c.tags ? c.tags : c.groups.flatMap(g => g.tags);
-    return `${c.key}(${c.title}): ${all.join('、')}`;
-  }).join('\n');
-
-  const charCatalog = CHAR_CATEGORIES.map(c => {
-    const all = c.tags ? c.tags : c.groups.flatMap(g => g.tags);
-    return `${c.key}(${c.title}): ${all.join('、')}`;
-  }).join('\n');
-
-  const prompt = `请根据以下聊天记录，为用户提取并匹配对应的角色扮演剧本标签。
-必须优先从下面给出的词库中精准原样挑选；如果聊到了词库里没有的具体脑洞或细节，请放进 extraNotes 字段里，不要丢失任何灵感。
-如果聊到了多个男主，请在 characters 数组里分别建好对应数量的角色对象并区分各自的标签。
-
-全局词库：
-${globalCatalog}
-
-单角色词库：
-${charCatalog}
-
-请只输出严格合法的 JSON，不要输出任何额外说明或代码块标记，结构如下：
-{
-  "global": {
-    "countMode": ["单男主纯爱"],
-    "world": [],
-    "tone": [],
-    "userRole": [],
-    "conflict": [],
-    "opening": []
-  },
-  "extraNotes": "词库外的具体脑洞与要求",
-  "characters": [
-    {
-      "name": "角色 1",
-      "tags": {
-        "species": [],
-        "vibe": [],
-        "personality": [],
-        "identity": [],
-        "speech": [],
-        "innerCore": [],
-        "relation": [],
-        "loveStyle": []
-      }
-    }
-  ]
-}`;
-
-  try {
-    const convo = state.chatHistory.map(m => `${m.role === 'user' ? '用户' : '策划'}: ${m.content}`).join('\n');
-    const raw = await callLLM([
-      { role: 'system', content: '你是精准的数据提取助手，只输出严格 JSON。' },
-      { role: 'user', content: prompt + '\n\n聊天记录如下：\n' + convo }
-    ], { streamOverride: false, temperature: 0.2 });
-
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('未能解析出有效标签数据');
-    const parsed = JSON.parse(jsonMatch[0]);
-
-    const nextDraft = createEmptyDraft();
-    if (parsed.global) {
-      Object.keys(nextDraft.global).forEach(k => {
-        if (Array.isArray(parsed.global[k])) nextDraft.global[k] = parsed.global[k].filter(Boolean);
-      });
-    }
-    if (parsed.extraNotes) nextDraft.extraNotes = String(parsed.extraNotes);
-    if (Array.isArray(parsed.characters) && parsed.characters.length) {
-      nextDraft.characters = parsed.characters.map((c, idx) => {
-        const nc = createEmptyChar(idx + 1);
-        nc.name = c.name || ('角色 ' + (idx + 1));
-        if (c.tags) {
-          Object.keys(nc.tags).forEach(k => {
-            if (Array.isArray(c.tags[k])) nc.tags[k] = c.tags[k].filter(Boolean);
-          });
-        }
-        return nc;
-      });
-    }
-
-    state.currentScript = nextDraft;
-    state.workshopTab = 'global';
-    persistDraft();
-    switchPage('workshop');
-    showToast('标签已自动勾选完毕，请你核对确认');
-  } catch (err) {
-    showToast('提取失败：' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '一键提取标签到工坊';
-  }
-}
-
-/* =========================================================
-   十、大纲打磨 -> 细拆设定 -> 固定模板自动拼装
-   ========================================================= */
 function buildTagPromptSummary() {
-  const g = state.currentScript.global;
-  const gLines = GLOBAL_CATEGORIES.map(c => {
-    const vals = g[c.key] || [];
-    return `${c.title}：${vals.length ? vals.join('、') : '自由发挥'}`;
+  const g = state.currentScript.global, gLines = [];
+  GLOBAL_CATEGORIES.forEach(c => { const vals = (g[c.key] || []).filter(Boolean); if (vals.length) gLines.push(`${c.title}：${vals.join('、')}`); });
+  if ((state.currentScript.extraNotes || '').trim()) gLines.push(`额外脑洞与避雷要求（必须严格遵守）：${state.currentScript.extraNotes.trim()}`);
+  const cBlocks = state.currentScript.characters.map((ch, idx) => {
+    const label = ch.name || ('角色 ' + (idx + 1)), lines = [];
+    CHAR_CATEGORIES.forEach(c => { const vals = (ch.tags[c.key] || []).filter(Boolean); if (vals.length) lines.push(`  ${c.title}：${vals.join('、')}`); });
+    return lines.length ? `【${label}】\n${lines.join('\n')}` : `【${label}】\n  （该角色未限制，请结合上方全局标签自由创作出有活人感与反差感的人物）`;
   });
-  if (state.currentScript.extraNotes.trim()) {
-    gLines.push(`用户额外脑洞与补充：${state.currentScript.extraNotes.trim()}`);
-  }
-
-  const cLines = state.currentScript.characters.map((ch, idx) => {
-    const lines = CHAR_CATEGORIES.map(c => {
-      const vals = ch.tags[c.key] || [];
-      return `  ${c.title}：${vals.length ? vals.join('、') : '自由发挥'}`;
-    });
-    return `【${ch.name || ('角色 ' + (idx + 1))}】\n` + lines.join('\n');
-  });
-
-  return `一、全局设定\n${gLines.join('\n')}\n\n二、角色设定标签（共 ${state.currentScript.characters.length} 位主要角色，请务必严格区分各自性格、身份与关系，不要混淆）\n${cLines.join('\n\n')}`;
+  const sections = [];
+  if (gLines.length) sections.push(`一、用户已选全局设定\n${gLines.join('\n')}`);
+  sections.push(`二、主要角色清单（共 ${state.currentScript.characters.length} 位主要角色）\n${cBlocks.join('\n\n')}`);
+  sections.push(`三、留空项处理规则\n用户只选择自己关心的核心标签，未列出的分类属于刻意留白，请围绕已选标签自由发挥补全。你已经收到了全部设定，请直接开始创作，禁止回复没收到标签、设定为空或向用户反问。`);
+  return sections.join('\n\n');
 }
+
+function renderStudioTagStrip() {
+  const box = document.getElementById('studioTagStrip'), s = state.currentScript, groups = [], gTags = [];
+  GLOBAL_CATEGORIES.forEach(c => (s.global[c.key] || []).forEach(t => gTags.push(t)));
+  groups.push({ name: '全局设定', cls: 'terra', tags: gTags });
+  s.characters.forEach((ch, idx) => {
+    const tags = [];
+    CHAR_CATEGORIES.forEach(c => (ch.tags[c.key] || []).forEach(t => tags.push(t)));
+    groups.push({ name: ch.name || ('角色 ' + (idx + 1)), cls: 'sage', tags });
+  });
+  const total = groups.reduce((a, g) => a + g.tags.length, 0), extra = (s.extraNotes || '').trim(), hasStyle = !!(state.stylePrompt || '').trim();
+  const summary = groups.map(g => `${g.name} ${g.tags.length}项`).join('  ·  ') + (hasStyle ? '  ·  已启用文笔限制' : '');
+  box.className = 'tag-summary-strip' + (state.tagStripOpen ? ' open' : '');
+  box.innerHTML = `<div class="tag-strip-head" onclick="toggleTagStrip()"><div style="min-width:0;flex:1;"><div style="font-weight:700;color:var(--ink);font-size:12.5px;">本次已带入 ${total} 个标签${extra ? '，含额外补充' : ''}</div><div class="tag-strip-summary">${escapeHtml(summary)}</div></div><span class="tag-strip-toggle">${state.tagStripOpen ? '收起' : '展开'}<span class="cat-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span></span></div>
+    <div class="tag-strip-body">${groups.map(g => `<div class="tag-strip-group"><div class="tag-strip-group-title">${escapeHtml(g.name)}</div><div class="tag-summary-pills">${g.tags.length ? g.tags.map(t => `<span class="badge ${g.cls}">${escapeHtml(t)}</span>`).join('') : '<span class="badge soft">未指定，由模型补全</span>'}</div></div>`).join('')}${extra ? `<div class="tag-strip-group"><div class="tag-strip-group-title">额外脑洞与避雷</div><div style="font-size:12px;color:var(--ink-2);white-space:pre-wrap;line-height:1.6;">${escapeHtml(extra)}</div></div>` : ''}</div>`;
+}
+function toggleTagStrip() { state.tagStripOpen = !state.tagStripOpen; renderStudioTagStrip(); }
 
 function goGenerateOutline() {
   const total = countGlobalTags() + state.currentScript.characters.reduce((s, c) => s + countCharTags(c), 0);
-  if (total === 0 && !state.currentScript.extraNotes.trim()) {
-    showToast('请先挑选至少几个标签，或点重摇随机生成');
-    return;
-  }
-  state.studioStep = 1;
-  switchPage('studio');
-  if (!state.currentScript.outline.trim()) {
-    generateOutline(false);
-  }
+  if (total === 0 && !(state.currentScript.extraNotes || '').trim()) return showToast('请至少选 1 个标签或写一句脑洞，或者点重摇随机抽取');
+  const shouldGenerate = !state.currentScript.outline.trim() || state.currentScript.lastOutlineTagHash !== computeCurrentTagHash();
+  state.studioStep = 1; state.tagStripOpen = false; switchPage('studio');
+  if (shouldGenerate) generateOutline(false);
 }
-
 function renderStudio() {
   document.getElementById('stepBtn1').classList.toggle('active', state.studioStep === 1);
   document.getElementById('stepBtn2').classList.toggle('active', state.studioStep === 2);
   document.getElementById('studioStep1').style.display = state.studioStep === 1 ? 'block' : 'none';
   document.getElementById('studioStep2').style.display = state.studioStep === 2 ? 'block' : 'none';
-
+  renderStudioTagStrip();
   document.getElementById('scriptTitleInput').value = state.currentScript.title || '';
   document.getElementById('outlineEditor').value = state.currentScript.outline || '';
   syncFinalEditorDisplay();
 }
-
-function switchStudioStep(step) {
-  state.studioStep = step;
-  renderStudio();
-}
-
-function setStudioLoading(loading, text = '生成中...') {
-  const el = document.getElementById('studioLoading');
-  el.style.display = loading ? 'inline-flex' : 'none';
-  document.getElementById('studioLoadingText').textContent = text;
-}
+function switchStudioStep(step) { state.studioStep = step; renderStudio(); }
+function setStudioLoading(loading, text = '生成中...') { document.getElementById('studioLoading').style.display = loading ? 'inline-flex' : 'none'; document.getElementById('studioLoadingText').textContent = text; }
 
 async function generateOutline(isRevise = false) {
   if (!ensureApiReady()) return;
-
   const reviseNote = isRevise ? document.getElementById('outlineReviseInput').value.trim() : '';
-  if (isRevise && !reviseNote) {
-    showToast('请先输入微调修改意见');
-    return;
-  }
-
-  const tagSummary = buildTagPromptSummary();
-  const sysPrompt = `你是一位擅长创作高质感、强活人感、反套路角色扮演剧本的资深编剧。
-请根据用户敲定的标签，生成一份用于角色扮演起手式的故事大纲。
-
-必须严格遵守以下创作铁律：
-1、绝对禁止写到大结局，也不要把中后期感情线和真相全部剧透写死！角色扮演的核心魅力是只把舞台搭好、把人物拉扯感和开局悬念埋足，后面的发展全部留给玩家亲自去玩。
-2、极度强调活人感、真实生活细节与人物反差，拒绝狗血霸总模板、廉价网文套话和空洞形容词。
-3、如果包含多位角色，必须明确区分每位角色的立场、与用户的差异化关系，写出修罗场或暗流涌动的空间。
-4、输出纯文本清晰排版，不使用多余星号和繁杂符号。第一行请单独写：标题：XXX（给故事起一个有电影感或小说感的好名字），空一行后依次呈现：世界观与当下切面、人物关系与暗涌张力、用户的入局处境、开局起手式设计。`;
-
-  const userPrompt = isRevise
-    ? `原始标签设定如下：\n${tagSummary}\n\n当前版本大纲：\n${state.currentScript.outline}\n\n请根据以下修改意见对大纲进行局部改写与优化（依然严禁写到大结局）：\n${reviseNote}`
-    : `请根据以下已确认的标签，生成故事大纲：\n\n${tagSummary}`;
+  if (isRevise && !reviseNote) return showToast('请先输入微调修改意见');
+  const tagSummary = buildTagPromptSummary(), styleBlock = getStylePromptBlock();
+  const rulesText = `【创作任务与铁律】
+请根据下方用户已选定的标签，直接输出一份角色扮演起手式故事大纲。
+1、禁止写到大结局，也不要把中后期感情线和真相剧透写死。只把舞台搭好，把人物拉扯感和开局悬念埋足，后续发展留给玩家。
+2、未提及的维度由你结合已选标签自由发挥补全。禁止说没收到标签、设定为空或反问用户，必须直接交出大纲正文。
+3、严格遵守用户填写的全部避雷条件和剧本文笔限制指令。如果有多位角色，明确区分每位角色的立场、性格与差异化关系。
+4、输出纯文本，不使用井号标题、星号加粗和表格。第一行单独写：标题：XXX，空一行后依次写：世界观与当下切面、人物关系与暗涌张力、用户的入局处境、开局起手式设计。`;
+  const combinedUserPrompt = isRevise
+    ? `${rulesText}${styleBlock}\n\n${tagSummary}\n\n【当前版本大纲】\n${state.currentScript.outline}\n\n【用户微调意见】\n${reviseNote}\n\n请按修改意见重写大纲正文（禁止写到大结局）：`
+    : `${rulesText}${styleBlock}\n\n${tagSummary}\n\n请直接输出完整故事大纲正文：`;
 
   setStudioLoading(true, isRevise ? '正在微调大纲...' : '正在构思大纲...');
-  const editor = document.getElementById('outlineEditor');
-
+  const editor = document.getElementById('outlineEditor'), previousOutline = state.currentScript.outline;
+  if (!isRevise) { state.currentScript.outline = ''; editor.value = ''; }
   try {
-    const out = await callLLM([
-      { role: 'system', content: sysPrompt },
-      { role: 'user', content: userPrompt }
-    ], {
-      onChunk: (partial) => {
-        state.currentScript.outline = partial;
-        editor.value = partial;
-      }
-    });
+    const out = await callLLM([{ role: 'user', content: combinedUserPrompt }], { onChunk: (p) => { state.currentScript.outline = p; editor.value = p; } });
+    if (!out.trim()) throw new Error('模型返回了空内容');
     state.currentScript.outline = out.trim();
-    // 自动提取标题
-    const titleMatch = out.match(/标题[：:]\s*([^\n]+)/);
-    if (titleMatch && !state.currentScript.title) {
-      state.currentScript.title = titleMatch[1].replace(/[《》【】*]/g, '').trim();
-      document.getElementById('scriptTitleInput').value = state.currentScript.title;
-    }
+    state.currentScript.lastOutlineTagHash = computeCurrentTagHash();
+    const m = out.match(/标题[：:]\s*([^\n]+)/);
+    if (m) { state.currentScript.title = m[1].replace(/[《》【】*#]/g, '').trim(); document.getElementById('scriptTitleInput').value = state.currentScript.title; }
     if (isRevise) document.getElementById('outlineReviseInput').value = '';
-    persistDraft();
-    showToast('故事大纲已就绪，可自由修改后再细拆');
+    persistDraft(); saveCurrentToLibrary(true); showToast('故事大纲已就绪，可修改后再细拆');
   } catch (err) {
+    if (!state.currentScript.outline.trim() && previousOutline) { state.currentScript.outline = previousOutline; editor.value = previousOutline; }
     showToast('大纲生成失败：' + err.message);
-  } finally {
-    setStudioLoading(false);
-  }
+  } finally { setStudioLoading(false); }
 }
 
-function assembleCompleteScript(rolesText, userAndOpeningText) {
-  const parts = [
-    state.template.header.trim(),
-    rolesText.trim(),
-    state.template.middle.trim(),
-    userAndOpeningText.trim(),
-    state.template.footer.trim()
-  ].filter(Boolean);
-  return parts.join('\n\n\n');
-}
-
+function assembleCompleteScript(rolesText, userAndOpeningText) { return [state.template.header.trim(), rolesText.trim(), state.template.middle.trim(), userAndOpeningText.trim(), state.template.footer.trim()].filter(Boolean).join('\n\n\n'); }
 function syncFinalEditorDisplay() {
-  const editor = document.getElementById('finalScriptEditor');
-  const btn = document.getElementById('viewModeBtn');
-  if (state.showOnlyDetail) {
-    btn.textContent = '看完整拼装';
-    const combinedDetail = [state.currentScript.detailRolesPart, state.currentScript.detailUserPart].filter(Boolean).join('\n\n');
-    editor.value = combinedDetail;
-  } else {
-    btn.textContent = '仅看细拆';
-    editor.value = state.currentScript.finalFullText || '';
-  }
+  const editor = document.getElementById('finalScriptEditor'), btn = document.getElementById('viewModeBtn');
+  if (state.showOnlyDetail) { btn.textContent = '看完整拼装'; editor.value = [state.currentScript.detailRolesPart, state.currentScript.detailUserPart].filter(Boolean).join('\n\n'); }
+  else { btn.textContent = '仅看细拆'; editor.value = state.currentScript.finalFullText || ''; }
 }
-
-function toggleFinalViewMode() {
-  state.showOnlyDetail = !state.showOnlyDetail;
-  syncFinalEditorDisplay();
-}
-
-function onFinalEditorInput(val) {
-  if (!state.showOnlyDetail) {
-    state.currentScript.finalFullText = val;
-    persistDraft();
-  }
-}
+function toggleFinalViewMode() { state.showOnlyDetail = !state.showOnlyDetail; syncFinalEditorDisplay(); }
+function onFinalEditorInput(val) { if (!state.showOnlyDetail) { state.currentScript.finalFullText = val; persistDraft(); } }
 
 async function generateFullDetails() {
-  if (!state.currentScript.outline.trim()) {
-    showToast('请先生成或填写故事大纲');
-    return;
-  }
+  if (!state.currentScript.outline.trim()) return showToast('请先生成或填写故事大纲');
   if (!ensureApiReady()) return;
-
-  state.studioStep = 2;
-  state.showOnlyDetail = false;
-  renderStudio();
+  state.studioStep = 2; state.showOnlyDetail = false; renderStudio();
   setStudioLoading(true, '正在按文档框架细拆人物与开场...');
+  const charCount = state.currentScript.characters.length, styleBlock = getStylePromptBlock();
+  const multiNote = charCount > 1 ? `本次剧本包含 ${charCount} 位主要角色，请在角色设定部分分别完整写出每一位角色的全部字段（用“角色设定（角色一：姓名）”、“角色设定（角色二：姓名）”区分），不能合并简写。` : '请严格输出以下角色设定全部字段。';
+  const combinedPrompt = `请根据下方已确认的标签、故事大纲与文笔限制指令，严格按照指定字段进行深度细拆，直接输出正文，不要寒暄也不要反问。
 
-  const charCount = state.currentScript.characters.length;
-  const multiNote = charCount > 1
-    ? `本次剧本包含 ${charCount} 位主要角色，请在角色设定部分分别完整写出每一位角色的全部字段（用“角色设定（角色一：姓名）”和“角色设定（角色二：姓名）”区分），绝不能合并简写。`
-    : '请严格输出以下角色设定全部字段。';
-
-  const sysPrompt = `你是一位顶级的角色扮演设定师。你需要根据已确认的标签与故事大纲，严格按照指定字段进行深度细拆。
 写作要求：
-1、极强活人感、反套路、去网文廉价辞藻，每个角色要有真实缺点、日常小习惯和鲜活语感。
-2、“内在精神想法”必须先用一句极实在的大白话点破他对世界和人际关系的底层看法，并保留冰山暗线提醒。
-3、“说话习惯与台词范例”必须给出3到5句贴合他平时说话口吻的真实短句范例，拒绝公关腔和翻译腔。
-4、“开场剧情”要写出极具画面感和动作留白的开局起手式，采用第三人称白描，严禁代写用户的任何台词、心理、动作或决定，在恰好需要用户做出反应或表态的瞬间自然停笔。
-5、输出纯文本，严禁使用 Markdown 的 # 标题、** 加粗符号或表格。
-6、请务必在“角色设定”全部写完之后、写“用户的故事背景”之前，单独输出一行分隔标记：===SPLIT_USER_PART=== 以便系统将中间的文字输出排版要求自动精准插入。`;
+1、严格遵守下方全部避雷要求和剧本文笔限制指令。
+2、“内在精神想法”先用一句很实在的大白话点破他对世界和人际关系的底层看法，并保留冰山暗线提醒。
+3、“说话习惯与台词范例”给出3到5句贴合他平时口吻的真实短句。
+4、“开场剧情”采用第三人称，严禁代写用户的任何台词、心理、动作或决定，在需要用户反应或表态的瞬间自然停笔。
+5、输出纯文本，严禁使用井号标题、星号加粗或表格。
+6、在“角色设定”全部写完之后、写“用户的故事背景”之前，单独输出一行分隔标记：===SPLIT_USER_PART===${styleBlock}
 
-  const userPrompt = `【已确认标签】
+【已确认标签】
 ${buildTagPromptSummary()}
 
 【已确认故事大纲】
@@ -2737,362 +1093,133 @@ ${multiNote}
 ===SPLIT_USER_PART===
 
 用户的故事背景
-（贴合大纲与用户身份定位，交代用户在当前世界里的处境、身份和与角色的渊源，保留玩家可自由发挥的空间）
+（贴合大纲与用户身份定位，交代用户在当前世界里的处境、身份和与角色的渊源，保留玩家自由发挥的空间）
 
 用户的补充
 （留空或给出一行简短提示，方便玩家开玩前自己加私有设定）
 
 开场剧情
-（第一行按“时间 空格 天气 空格 地点”格式起笔，空一行后进入极具画面感的纯文本开局，精准停在需要用户接话或行动的节点，绝不代写用户）`;
+（第一行按“时间 空格 天气 空格 地点”格式起笔，空一行后进入纯文本开局，停在需要用户接话或行动的节点，绝不代写用户）`;
 
   const editor = document.getElementById('finalScriptEditor');
   document.getElementById('startDetailBtn').disabled = true;
-
   try {
-    const raw = await callLLM([
-      { role: 'system', content: sysPrompt },
-      { role: 'user', content: userPrompt }
-    ], {
-      onChunk: (partial) => {
-        editor.value = partial;
-      }
-    });
-
-    let rolesPart = raw;
-    let userPart = '';
-    if (raw.includes('===SPLIT_USER_PART===')) {
-      const sp = raw.split('===SPLIT_USER_PART===');
-      rolesPart = sp[0].trim();
-      userPart = sp.slice(1).join('\n\n').trim();
-    } else {
-      const fallbackIdx = raw.indexOf('用户的故事背景');
-      if (fallbackIdx > 0) {
-        rolesPart = raw.slice(0, fallbackIdx).trim();
-        userPart = raw.slice(fallbackIdx).trim();
-      }
+    let raw = await callLLM([{ role: 'user', content: combinedPrompt }], { onChunk: (p) => { editor.value = p; } });
+    let rounds = 0;
+    while (lastFinishReason === 'length' && rounds < 3) {
+      rounds++;
+      setStudioLoading(true, `内容较长，正在自动续写第 ${rounds} 段...`);
+      const base = raw;
+      const more = await callLLM([
+        { role: 'user', content: combinedPrompt }, { role: 'assistant', content: base },
+        { role: 'user', content: '你上一条输出因为长度限制被截断了。请从被截断的那个字之后直接接着写，不要重复已经写过的内容，不要加任何说明，保持同样格式，把剩下的字段全部写完。' }
+      ], { onChunk: (p) => { editor.value = base + p; } });
+      raw = base + more;
     }
+    if (lastFinishReason === 'length') showToast('内容仍未写完，建议在设置里调大最大回复长度后重新细拆');
 
-    state.currentScript.detailRolesPart = rolesPart;
-    state.currentScript.detailUserPart = userPart;
+    let rolesPart = raw, userPart = '';
+    if (raw.includes('===SPLIT_USER_PART===')) {
+      const sp = raw.split('===SPLIT_USER_PART==='); rolesPart = sp[0].trim(); userPart = sp.slice(1).join('\n\n').trim();
+    } else {
+      const idx = raw.indexOf('用户的故事背景');
+      if (idx > 0) { rolesPart = raw.slice(0, idx).trim(); userPart = raw.slice(idx).trim(); }
+    }
+    state.currentScript.detailRolesPart = rolesPart; state.currentScript.detailUserPart = userPart;
     state.currentScript.finalFullText = assembleCompleteScript(rolesPart, userPart);
-
-    persistDraft();
-    syncFinalEditorDisplay();
-    saveCurrentToLibrary(true);
-    showToast('细拆完成，已无缝拼装 2.0 固定指令并自动存档');
+    persistDraft(); syncFinalEditorDisplay(); saveCurrentToLibrary(true);
+    if (lastFinishReason !== 'length') showToast('细拆完成，已拼装 2.0 固定指令并自动存档');
   } catch (err) {
     showToast('细拆生成失败：' + err.message);
-  } finally {
-    setStudioLoading(false);
-    document.getElementById('startDetailBtn').disabled = false;
-  }
+  } finally { setStudioLoading(false); document.getElementById('startDetailBtn').disabled = false; }
 }
 
-/* =========================================================
-   十一、一键复制、TXT 导出与纯前端零依赖原生 DOCX 生成器
-   ========================================================= */
-function getExportFilename(ext) {
-  const title = (state.currentScript.title || '角色扮演剧本').replace(/[\\/:*?"<>|]/g, '').trim();
-  return `${title || '角色扮演剧本'}.${ext}`;
-}
-
+function getExportFilename(ext) { return `${(state.currentScript.title || '角色扮演剧本').replace(/[\\/:*?"<>|]/g, '').trim() || '角色扮演剧本'}.${ext}`; }
 async function copyTextSafe(text) {
   if (!text) return showToast('暂无可复制内容');
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast('已复制完整剧本到剪贴板');
-  } catch (e) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    showToast('已复制完整剧本到剪贴板');
-  }
+  try { await navigator.clipboard.writeText(text); } catch (e) { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+  showToast('已复制完整剧本到剪贴板');
 }
-
-function copyFinalScript() {
-  const txt = state.currentScript.finalFullText || document.getElementById('finalScriptEditor').value;
-  copyTextSafe(txt);
-}
-
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, 500);
-}
-
+function copyFinalScript() { copyTextSafe(state.currentScript.finalFullText || document.getElementById('finalScriptEditor').value); }
+function downloadBlob(blob, filename) { const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500); }
 function exportFinalTxt(customText = null, customTitle = null) {
   const txt = customText || state.currentScript.finalFullText || document.getElementById('finalScriptEditor').value;
   if (!txt.trim()) return showToast('暂无可导出内容');
-  const blob = new Blob(['\uFEFF' + txt], { type: 'text/plain;charset=utf-8' });
-  const name = customTitle ? `${customTitle.replace(/[\\/:*?"<>|]/g, '')}.txt` : getExportFilename('txt');
-  downloadBlob(blob, name);
+  downloadBlob(new Blob(['\uFEFF' + txt], { type: 'text/plain;charset=utf-8' }), customTitle ? `${customTitle.replace(/[\\/:*?"<>|]/g, '')}.txt` : getExportFilename('txt'));
   showToast('已导出 TXT 文件');
 }
 
-/* 纯原生零依赖 ZIP/DOCX 打包（Stored模式 + 标准 CRC32，兼容 Word / WPS / 手机文档） */
-const CRC32_TABLE = (() => {
-  const t = new Uint32Array(256);
-  for (let i = 0; i < 256; i++) {
-    let c = i;
-    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-    t[i] = c >>> 0;
-  }
-  return t;
-})();
-
-function crc32(bytes) {
-  let c = 0xFFFFFFFF;
-  for (let i = 0; i < bytes.length; i++) c = CRC32_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
-  return (c ^ 0xFFFFFFFF) >>> 0;
-}
-
+const CRC32_TABLE = (() => { const t = new Uint32Array(256); for (let i = 0; i < 256; i++) { let c = i; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[i] = c >>> 0; } return t; })();
+function crc32(bytes) { let c = 0xFFFFFFFF; for (let i = 0; i < bytes.length; i++) c = CRC32_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
 function createStoredZip(files) {
-  const enc = new TextEncoder();
-  const localParts = [];
-  const centralParts = [];
-  let offset = 0;
-
+  const enc = new TextEncoder(), localParts = [], centralParts = []; let offset = 0;
   for (const f of files) {
-    const nameBytes = enc.encode(f.name);
-    const dataBytes = typeof f.content === 'string' ? enc.encode(f.content) : f.content;
-    const crc = crc32(dataBytes);
-    const size = dataBytes.length;
-
-    const lh = new Uint8Array(30 + nameBytes.length);
-    const lv = new DataView(lh.buffer);
-    lv.setUint32(0, 0x04034b50, true);
-    lv.setUint16(4, 20, true);
-    lv.setUint16(6, 0x0800, true);
-    lv.setUint16(8, 0, true);
-    lv.setUint16(10, 0, true);
-    lv.setUint16(12, 0, true);
-    lv.setUint32(14, crc, true);
-    lv.setUint32(18, size, true);
-    lv.setUint32(22, size, true);
-    lv.setUint16(26, nameBytes.length, true);
-    lv.setUint16(28, 0, true);
-    lh.set(nameBytes, 30);
-
-    localParts.push(lh, dataBytes);
-
-    const ch = new Uint8Array(46 + nameBytes.length);
-    const cv = new DataView(ch.buffer);
-    cv.setUint32(0, 0x02014b50, true);
-    cv.setUint16(4, 20, true);
-    cv.setUint16(6, 20, true);
-    cv.setUint16(8, 0x0800, true);
-    cv.setUint16(10, 0, true);
-    cv.setUint16(12, 0, true);
-    cv.setUint16(14, 0, true);
-    cv.setUint32(16, crc, true);
-    cv.setUint32(20, size, true);
-    cv.setUint32(24, size, true);
-    cv.setUint16(28, nameBytes.length, true);
-    cv.setUint16(30, 0, true);
-    cv.setUint16(32, 0, true);
-    cv.setUint16(34, 0, true);
-    cv.setUint16(36, 0, true);
-    cv.setUint32(38, 0, true);
-    cv.setUint32(42, offset, true);
-    ch.set(nameBytes, 46);
-    centralParts.push(ch);
-
+    const nameBytes = enc.encode(f.name), dataBytes = typeof f.content === 'string' ? enc.encode(f.content) : f.content, crc = crc32(dataBytes), size = dataBytes.length;
+    const lh = new Uint8Array(30 + nameBytes.length), lv = new DataView(lh.buffer);
+    lv.setUint32(0, 0x04034b50, true); lv.setUint16(4, 20, true); lv.setUint16(6, 0x0800, true); lv.setUint32(14, crc, true); lv.setUint32(18, size, true); lv.setUint32(22, size, true); lv.setUint16(26, nameBytes.length, true); lh.set(nameBytes, 30); localParts.push(lh, dataBytes);
+    const ch = new Uint8Array(46 + nameBytes.length), cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true); cv.setUint16(8, 0x0800, true); cv.setUint32(16, crc, true); cv.setUint32(20, size, true); cv.setUint32(24, size, true); cv.setUint16(28, nameBytes.length, true); cv.setUint32(42, offset, true); ch.set(nameBytes, 46); centralParts.push(ch);
     offset += lh.length + dataBytes.length;
   }
-
-  const centralSize = centralParts.reduce((s, b) => s + b.length, 0);
-  const eocd = new Uint8Array(22);
-  const ev = new DataView(eocd.buffer);
-  ev.setUint32(0, 0x06054b50, true);
-  ev.setUint16(4, 0, true);
-  ev.setUint16(6, 0, true);
-  ev.setUint16(8, files.length, true);
-  ev.setUint16(10, files.length, true);
-  ev.setUint32(12, centralSize, true);
-  ev.setUint32(16, offset, true);
-  ev.setUint16(20, 0, true);
-
-  return new Blob([...localParts, ...centralParts, eocd], {
-    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-  });
+  const centralSize = centralParts.reduce((s, b) => s + b.length, 0), eocd = new Uint8Array(22), ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true); ev.setUint16(8, files.length, true); ev.setUint16(10, files.length, true); ev.setUint32(12, centralSize, true); ev.setUint32(16, offset, true);
+  return new Blob([...localParts, ...centralParts, eocd], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 }
-
-function escapeXml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
+function escapeXml(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;'); }
 function buildDocxBlob(plainText) {
-  const lines = plainText.replace(/\r\n/g, '\n').split('\n');
-  const paragraphs = lines.map(line => {
-    if (!line.trim()) return '<w:p/>';
-    return `<w:p><w:r><w:rPr><w:rFonts w:ascii="PingFang SC" w:eastAsia="微软雅黑" w:hAnsi="PingFang SC"/><w:sz w:val="21"/></w:rPr><w:t xml:space="preserve">${escapeXml(line)}</w:t></w:r></w:p>`;
-  }).join('');
-
-  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>`;
-
-  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>`;
-
-  const docXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    ${paragraphs}
-    <w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr>
-  </w:body>
-</w:document>`;
-
+  const paragraphs = plainText.replace(/\r\n/g, '\n').split('\n').map(line => !line.trim() ? '<w:p/>' : `<w:p><w:r><w:rPr><w:rFonts w:ascii="PingFang SC" w:eastAsia="微软雅黑" w:hAnsi="PingFang SC"/><w:sz w:val="21"/></w:rPr><w:t xml:space="preserve">${escapeXml(line)}</w:t></w:r></w:p>`).join('');
   return createStoredZip([
-    { name: '[Content_Types].xml', content: contentTypes },
-    { name: '_rels/.rels', content: rels },
-    { name: 'word/document.xml', content: docXml }
+    { name: '[Content_Types].xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>` },
+    { name: '_rels/.rels', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>` },
+    { name: 'word/document.xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${paragraphs}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>` }
   ]);
 }
-
 function exportFinalDocx(customText = null, customTitle = null) {
   const txt = customText || state.currentScript.finalFullText || document.getElementById('finalScriptEditor').value;
   if (!txt.trim()) return showToast('暂无可导出内容');
-  const blob = buildDocxBlob(txt);
-  const name = customTitle ? `${customTitle.replace(/[\\/:*?"<>|]/g, '')}.docx` : getExportFilename('docx');
-  downloadBlob(blob, name);
+  downloadBlob(buildDocxBlob(txt), customTitle ? `${customTitle.replace(/[\\/:*?"<>|]/g, '')}.docx` : getExportFilename('docx'));
   showToast('已本地打包导出 DOCX 文档');
 }
 
-/* =========================================================
-   十二、本地剧本库（时间轴卡片式管理）
-   ========================================================= */
 function saveCurrentToLibrary(silent = false) {
   const s = state.currentScript;
-  if (!s.outline && !s.finalFullText) {
-    if (!silent) showToast('还没有生成内容可保存');
-    return;
-  }
-  const now = new Date();
-  const record = {
-    id: s.id || ('lib_' + Date.now()),
-    title: s.title || (s.global.world[0] ? s.global.world[0] + '剧本' : '未命名剧本'),
-    updatedAt: now.toISOString(),
-    world: [...(s.global.world || [])],
-    tone: [...(s.global.tone || [])],
-    charCount: s.characters.length,
-    hasFull: !!s.finalFullText,
-    snippet: (s.outline || s.finalFullText || '').slice(0, 88),
-    snapshot: JSON.parse(JSON.stringify(s))
-  };
+  if (!s.outline && !s.finalFullText) { if (!silent) showToast('还没有生成内容可保存'); return; }
+  const record = { id: s.id || ('lib_' + Date.now()), title: s.title || (s.global.world[0] ? s.global.world[0] + '剧本' : '未命名剧本'), updatedAt: new Date().toISOString(), world: [...(s.global.world || [])], tone: [...(s.global.tone || [])], charCount: s.characters.length, hasFull: !!s.finalFullText, snippet: (s.outline || s.finalFullText || '').slice(0, 88), snapshot: JSON.parse(JSON.stringify(s)) };
   s.id = record.id;
-
   const idx = state.library.findIndex(x => x.id === record.id);
-  if (idx >= 0) state.library[idx] = record;
-  else state.library.unshift(record);
-
-  persistLibrary();
-  persistDraft();
+  if (idx >= 0) state.library.splice(idx, 1);
+  state.library.unshift(record);
+  persistLibrary(); persistDraft();
   if (!silent) showToast('已保存到本地剧本库');
 }
-
-function formatTimelineDate(iso) {
-  const d = new Date(iso);
-  const hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-  const md = `${d.getMonth() + 1}月${d.getDate()}日`;
-  return { hm, md };
-}
-
+function formatTimelineDate(iso) { const d = new Date(iso); return { hm: String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'), md: `${d.getMonth() + 1}月${d.getDate()}日` }; }
 function renderLibrary() {
   document.getElementById('libraryCountText').textContent = `共 ${state.library.length} 份本地剧本`;
   const wrap = document.getElementById('libraryList');
-  if (!state.library.length) {
-    wrap.innerHTML = `<div class="empty-state"><div style="font-size:15px;font-weight:700;color:var(--ink);">本地剧本库还是空的</div><p>去随机抽一套标签，或者自定一个脑洞开始创作吧</p></div>`;
-    return;
-  }
-
+  if (!state.library.length) { wrap.innerHTML = `<div class="empty-state"><div style="font-size:15px;font-weight:700;color:var(--ink);">本地剧本库还是空的</div><p>去随机抽一套标签，或者说一句话直接开始创作吧</p></div>`; return; }
   wrap.innerHTML = state.library.map(item => {
     const { hm, md } = formatTimelineDate(item.updatedAt);
-    const wBadge = item.world[0] ? `<span class="badge terra">${escapeHtml(item.world[0])}</span>` : '';
-    const tBadge = item.tone[0] ? `<span class="badge sage">${escapeHtml(item.tone[0])}</span>` : '';
-    const statusBadge = item.hasFull ? `<span class="badge dark">已成稿</span>` : `<span class="badge soft">大纲中</span>`;
-    return `
-      <div class="timeline-item">
-        <div class="timeline-time">
-          <div class="t-main">${hm}</div>
-          <div class="t-sub">${md}</div>
-        </div>
-        <div class="timeline-card">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
-            <div class="lib-title">${escapeHtml(item.title)}</div>
-            <span class="badge soft" style="flex-shrink:0;">${item.charCount}男主</span>
-          </div>
-          <div class="lib-sub">${escapeHtml(item.snippet)}</div>
-          <div class="lib-tags">${statusBadge}${wBadge}${tBadge}</div>
-          <div class="lib-footer">
-            <div style="display:flex;gap:6px;">
-              <button class="btn btn-primary btn-xs" onclick="loadFromLibrary('${item.id}')">编辑</button>
-              <button class="btn btn-soft btn-xs" onclick="copyLibraryItem('${item.id}')">复制</button>
-              <button class="btn btn-soft btn-xs" onclick="exportLibraryItem('${item.id}','docx')">DOCX</button>
-            </div>
-            <button class="btn btn-terra btn-xs" onclick="deleteLibraryItem('${item.id}')">删除</button>
-          </div>
-        </div>
-      </div>
-    `;
+    return `<div class="timeline-item"><div class="timeline-time"><div class="t-main">${hm}</div><div class="t-sub">${md}</div></div>
+      <div class="timeline-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;"><div class="lib-title">${escapeHtml(item.title)}</div><span class="badge soft" style="flex-shrink:0;">${item.charCount}男主</span></div>
+        <div class="lib-sub">${escapeHtml(item.snippet)}</div>
+        <div class="lib-tags"><span class="badge ${item.hasFull ? 'dark' : 'soft'}">${item.hasFull ? '已成稿' : '大纲中'}</span>${item.world[0] ? `<span class="badge terra">${escapeHtml(item.world[0])}</span>` : ''}${item.tone[0] ? `<span class="badge sage">${escapeHtml(item.tone[0])}</span>` : ''}</div>
+        <div class="lib-footer"><div style="display:flex;gap:6px;"><button class="btn btn-primary btn-xs" onclick="loadFromLibrary('${item.id}')">编辑</button><button class="btn btn-soft btn-xs" onclick="copyLibraryItem('${item.id}')">复制</button><button class="btn btn-soft btn-xs" onclick="exportLibraryItem('${item.id}','docx')">DOCX</button></div><button class="btn btn-terra btn-xs" onclick="deleteLibraryItem('${item.id}')">删除</button></div>
+      </div></div>`;
   }).join('');
 }
-
 function loadFromLibrary(id) {
-  const item = state.library.find(x => x.id === id);
-  if (!item) return;
-  state.currentScript = JSON.parse(JSON.stringify(item.snapshot));
-  state.studioStep = state.currentScript.finalFullText ? 2 : 1;
-  persistDraft();
-  switchPage('studio');
-  showToast('已载入该剧本');
+  const item = state.library.find(x => x.id === id); if (!item) return;
+  if (state.currentScript.id !== id) archiveDraftIfNeeded();
+  const fresh = state.library.find(x => x.id === id) || item;
+  state.currentScript = { ...createEmptyDraft(), ...JSON.parse(JSON.stringify(fresh.snapshot)) };
+  state.studioStep = state.currentScript.finalFullText ? 2 : 1; state.tagStripOpen = false;
+  persistDraft(); switchPage('studio'); showToast('已载入该剧本');
 }
+function copyLibraryItem(id) { const item = state.library.find(x => x.id === id); if (item) copyTextSafe(item.snapshot.finalFullText || item.snapshot.outline || ''); }
+function exportLibraryItem(id, type) { const item = state.library.find(x => x.id === id); if (!item) return; const txt = item.snapshot.finalFullText || item.snapshot.outline || ''; if (type === 'docx') exportFinalDocx(txt, item.title); else exportFinalTxt(txt, item.title); }
+function deleteLibraryItem(id) { if (!confirm('确定删除这份剧本吗？删除后无法恢复。')) return; state.library = state.library.filter(x => x.id !== id); persistLibrary(); renderLibrary(); showToast('已从剧本库删除'); }
 
-function copyLibraryItem(id) {
-  const item = state.library.find(x => x.id === id);
-  if (!item) return;
-  const txt = item.snapshot.finalFullText || item.snapshot.outline || '';
-  copyTextSafe(txt);
-}
-
-function exportLibraryItem(id, type) {
-  const item = state.library.find(x => x.id === id);
-  if (!item) return;
-  const txt = item.snapshot.finalFullText || item.snapshot.outline || '';
-  if (type === 'docx') exportFinalDocx(txt, item.title);
-  else exportFinalTxt(txt, item.title);
-}
-
-function deleteLibraryItem(id) {
-  state.library = state.library.filter(x => x.id !== id);
-  persistLibrary();
-  renderLibrary();
-  showToast('已从剧本库删除');
-}
-
-/* =========================================================
-   十三、API 接口与固定模板设置页
-   ========================================================= */
 function renderSettings() {
   document.getElementById('apiBaseUrl').value = state.settings.baseUrl || '';
   document.getElementById('apiKey').value = state.settings.apiKey || '';
@@ -3100,39 +1227,43 @@ function renderSettings() {
   document.getElementById('apiTopP').value = state.settings.topP;
   document.getElementById('apiMaxTokens').value = state.settings.maxTokens;
   document.getElementById('apiStream').checked = !!state.settings.stream;
-  updateParamDisplay(false);
-  renderModelSelect();
-
+  updateParamDisplay(false); renderModelSelect();
+  document.getElementById('stylePromptInput').value = state.stylePrompt || '';
+  updateStylePromptPreview();
   document.getElementById('tplHeaderInput').value = state.template.header;
   document.getElementById('tplMidInput').value = state.template.middle;
   document.getElementById('tplFooterInput').value = state.template.footer;
 }
-
+function updateStylePromptPreview() {
+  const el = document.getElementById('stylePromptPreview'), txt = (state.stylePrompt || '').trim();
+  if (!el) return;
+  el.textContent = txt ? `已填写 ${txt.length} 字：${txt.slice(0, 28)}` : '未填写，点击粘贴你的文笔限制指令';
+  el.className = 'cat-preview' + (txt ? ' has-val' : '');
+}
+function saveStylePrompt(toast = false) {
+  state.stylePrompt = document.getElementById('stylePromptInput').value;
+  try { localStorage.setItem(STORAGE_KEYS.stylePrompt, state.stylePrompt); } catch (e) {}
+  updateStylePromptPreview();
+  if (toast) showToast('剧本文笔限制指令已保存');
+}
+function clearStylePrompt() {
+  state.stylePrompt = '';
+  document.getElementById('stylePromptInput').value = '';
+  try { localStorage.removeItem(STORAGE_KEYS.stylePrompt); } catch (e) {}
+  updateStylePromptPreview();
+  showToast('已清空文笔限制指令');
+}
 function renderModelSelect() {
-  const sel = document.getElementById('apiModelSelect');
-  const models = state.settings.models || [];
-  if (!models.length) {
-    sel.innerHTML = `<option value="${escapeHtml(state.settings.model || '')}">${escapeHtml(state.settings.model || '请点击下方自动获取模型')}</option>`;
-    return;
-  }
-  sel.innerHTML = models.map(m => `<option value="${escapeHtml(m)}" ${m === state.settings.model ? 'selected' : ''}>${escapeHtml(m)}</option>`).join('');
+  const sel = document.getElementById('apiModelSelect'), models = state.settings.models || [];
+  sel.innerHTML = models.length ? models.map(m => `<option value="${escapeHtml(m)}" ${m === state.settings.model ? 'selected' : ''}>${escapeHtml(m)}</option>`).join('') : `<option value="${escapeHtml(state.settings.model || '')}">${escapeHtml(state.settings.model || '请点击下方自动获取模型')}</option>`;
 }
-
-function onModelSelectChange(val) {
-  state.settings.model = val;
-  saveSettings();
-}
-
+function onModelSelectChange(val) { state.settings.model = val; saveSettings(); }
 function updateParamDisplay(doSave = true) {
-  const t = Number(document.getElementById('apiTemp').value);
-  const p = Number(document.getElementById('apiTopP').value);
-  const m = Number(document.getElementById('apiMaxTokens').value);
-  document.getElementById('tempVal').textContent = t.toFixed(2);
-  document.getElementById('topPVal').textContent = p.toFixed(2);
-  document.getElementById('maxTokVal').textContent = m;
+  document.getElementById('tempVal').textContent = Number(document.getElementById('apiTemp').value).toFixed(2);
+  document.getElementById('topPVal').textContent = Number(document.getElementById('apiTopP').value).toFixed(2);
+  document.getElementById('maxTokVal').textContent = document.getElementById('apiMaxTokens').value;
   if (doSave) saveSettings();
 }
-
 function saveSettings() {
   state.settings.baseUrl = document.getElementById('apiBaseUrl').value.trim();
   state.settings.apiKey = document.getElementById('apiKey').value.trim();
@@ -3143,78 +1274,34 @@ function saveSettings() {
   localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
   updateTopbarStatus();
 }
-
-function toggleKeyVis() {
-  const input = document.getElementById('apiKey');
-  input.type = input.type === 'password' ? 'text' : 'password';
-}
-
+function toggleKeyVis() { const input = document.getElementById('apiKey'); input.type = input.type === 'password' ? 'text' : 'password'; }
 async function fetchModels() {
-  saveSettings();
-  const baseUrl = getNormalizedBaseUrl();
-  if (!baseUrl || !state.settings.apiKey) {
-    showToast('请先填写 Base URL 和 Key');
-    return;
-  }
-  const btn = document.getElementById('fetchModelsBtn');
-  btn.disabled = true;
-  btn.textContent = '正在获取模型列表...';
+  saveSettings(); const baseUrl = getNormalizedBaseUrl();
+  if (!baseUrl || !state.settings.apiKey) return showToast('请先填写 Base URL 和 Key');
+  const btn = document.getElementById('fetchModelsBtn'); btn.disabled = true; btn.textContent = '正在获取模型列表...';
   try {
-    const resp = await fetch(`${baseUrl}/models`, {
-      headers: { 'Authorization': `Bearer ${state.settings.apiKey}` }
-    });
+    const resp = await fetch(`${baseUrl}/models`, { headers: { 'Authorization': `Bearer ${state.settings.apiKey}` } });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    const list = (data.data || []).map(x => x.id).filter(Boolean).sort();
+    const list = ((await resp.json()).data || []).map(x => x.id).filter(Boolean).sort();
     if (!list.length) throw new Error('返回模型列表为空');
-    state.settings.models = list;
-    if (!list.includes(state.settings.model)) {
-      state.settings.model = list[0];
-    }
-    state.settings.connStatus = 'ok';
-    localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
-    renderModelSelect();
-    updateTopbarStatus();
-    showToast(`成功获取 ${list.length} 个模型`);
-  } catch (err) {
-    state.settings.connStatus = 'err';
-    updateTopbarStatus();
-    showToast('获取模型失败：' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '自动获取模型';
-  }
+    state.settings.models = list; if (!list.includes(state.settings.model)) state.settings.model = list[0];
+    state.settings.connStatus = 'ok'; localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+    renderModelSelect(); updateTopbarStatus(); showToast(`成功获取 ${list.length} 个模型`);
+  } catch (err) { state.settings.connStatus = 'err'; updateTopbarStatus(); showToast('获取模型失败：' + err.message); }
+  finally { btn.disabled = false; btn.textContent = '自动获取模型'; }
 }
-
 async function testConnection() {
   saveSettings();
-  if (!getNormalizedBaseUrl() || !state.settings.apiKey) {
-    showToast('请先填写接口地址和密钥');
-    return;
-  }
-  if (!state.settings.model) {
-    await fetchModels();
-    if (!state.settings.model) return;
-  }
-  const btn = document.getElementById('testConnBtn');
-  btn.disabled = true;
-  btn.textContent = '正在测试连接...';
+  if (!getNormalizedBaseUrl() || !state.settings.apiKey) return showToast('请先填写接口地址和密钥');
+  if (!state.settings.model) { await fetchModels(); if (!state.settings.model) return; }
+  const btn = document.getElementById('testConnBtn'); btn.disabled = true; btn.textContent = '正在测试连接...';
   try {
     await callLLM([{ role: 'user', content: '请只回复两个字：正常' }], { maxTokens: 16, streamOverride: false });
-    state.settings.connStatus = 'ok';
-    localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
-    updateTopbarStatus();
-    showToast('连接测试成功，模型响应正常');
-  } catch (err) {
-    state.settings.connStatus = 'err';
-    updateTopbarStatus();
-    showToast('连接失败：' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '测试连接';
-  }
+    state.settings.connStatus = 'ok'; localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+    updateTopbarStatus(); showToast('连接测试成功，模型响应正常');
+  } catch (err) { state.settings.connStatus = 'err'; updateTopbarStatus(); showToast('连接失败：' + err.message); }
+  finally { btn.disabled = false; btn.textContent = '测试连接'; }
 }
-
 function saveTemplateSettings(toast = false) {
   state.template.header = document.getElementById('tplHeaderInput').value;
   state.template.middle = document.getElementById('tplMidInput').value;
@@ -3222,38 +1309,11 @@ function saveTemplateSettings(toast = false) {
   localStorage.setItem(STORAGE_KEYS.template, JSON.stringify(state.template));
   if (toast) showToast('固定规则模板已保存');
 }
+function resetTemplateDefaults() { state.template = { ...DEFAULT_TEMPLATE }; localStorage.setItem(STORAGE_KEYS.template, JSON.stringify(state.template)); renderSettings(); showToast('已恢复小雨滴指令 2.0 默认全文'); }
 
-function resetTemplateDefaults() {
-  state.template = { ...DEFAULT_TEMPLATE };
-  localStorage.setItem(STORAGE_KEYS.template, JSON.stringify(state.template));
-  renderSettings();
-  showToast('已恢复小雨滴指令 2.0 默认全文');
-}
-
-/* =========================================================
-   十四、工具函数与启动初始化
-   ========================================================= */
-function escapeHtml(str) {
-  return String(str || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-function escapeJs(str) {
-  return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-}
-
-document.getElementById('chatInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendChatMessage();
-  }
-});
-document.getElementById('customTagInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') confirmAddCustomTag();
-});
+function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+function escapeAttrJs(str) { return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, ' '); }
+document.getElementById('customTagInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmAddCustomTag(); });
 
 loadAllStorage();
 updateTopbarStatus();
